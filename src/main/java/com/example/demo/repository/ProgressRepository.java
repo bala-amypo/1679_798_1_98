@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProgressRepository extends JpaRepository<Progress, Long> {
-    // Custom methods for exact test requirements
+
+    // Exact signatures required for test cases
     Optional<Progress> findByUserIdAndMicroLessonId(Long userId, Long lessonId);
     List<Progress> findByUserIdOrderByLastAccessedAtDesc(Long userId);
 }
