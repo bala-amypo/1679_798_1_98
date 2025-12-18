@@ -1,29 +1,34 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.User;
-import com.example.demo.dto.AuthResponse;
 import com.example.demo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
+@Tag(name = "Authentication", description = "User registration and login APIs")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Operation(summary = "Register a new user")
     @PostMapping("/register")
-    public AuthResponse register(@RequestBody User user) {
-        userService.register(user);
-        return new AuthResponse("User registered successfully");
+    public User register(@RequestBody User user) {
+        return userService.register(user);
     }
 
+    @Operation(summary = "Login and get JWT token")
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request) {
-        return userService.login(request.getEmail(), request.getPassword());
+    public Map<String, String> login(@RequestBody Map<String, String> request) {
+        String token = userService.login(request.get("email"), request.get("password"));
+        return Map.of("token", token);
     }
-
-    // DTO for login request
-    public static record LoginRequest(String email, String password) {}
 }
