@@ -1,5 +1,5 @@
 package com.example.demo.entity;
-
+import lombok.Builder;
 import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

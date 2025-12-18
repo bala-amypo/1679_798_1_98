@@ -1,5 +1,5 @@
 package com.example.demo.entity;
-
+import lombok.Builder;
 import java.time.LocalDate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,7 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 @Builder
 @Entity
-public class Microlesson {
+public class MicroLesson {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
