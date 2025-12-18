@@ -19,7 +19,7 @@ public class Progress {
 @JoinColumn(name = "user_id", nullable = false)
     private User user;
      @ManyToOne
-    @JoinColumn(name = "micro_lesson_id", nullable = false)
+    @JoinColumn(name = "micro_Lesson_id", nullable = false)
     private Microlesson microLesson;
     private String status;
     private Integer progressPercent;

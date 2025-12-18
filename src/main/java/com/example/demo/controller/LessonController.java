@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@Tag(name = "Lessons", description = "Micro-lesson APIs")
+@Tag(name = "Lessons", description = "Micro-Lesson APIs")
 @RestController
 @RequestMapping("/lessons")
 public class LessonController {
