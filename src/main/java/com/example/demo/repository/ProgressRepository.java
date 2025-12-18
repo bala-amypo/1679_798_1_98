@@ -2,11 +2,11 @@ package com.example.demo.repository;
 
 import com.example.demo.entity.Progress;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 public interface ProgressRepository extends JpaRepository<Progress, Long> {
-    // Required by automated test
+    // Custom methods for exact test requirements
     Optional<Progress> findByUserIdAndMicroLessonId(Long userId, Long lessonId);
     List<Progress> findByUserIdOrderByLastAccessedAtDesc(Long userId);
 }
