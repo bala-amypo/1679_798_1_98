@@ -9,22 +9,29 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
+
 @Builder
 @Entity
 public class Progress {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
-@JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-     @ManyToOne
-    @JoinColumn(name = "micro_Lesson_id", nullable = false)
-    private Microlesson microLesson;
+
+    @ManyToOne
+    @JoinColumn(name = "micro_lesson_id", nullable = false)
+    private MicroLesson microLesson;
+
     private String status;
     private Integer progressPercent;
     private LocalDateTime lastAccessedAt;
     private BigDecimal score;
+
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -37,10 +44,10 @@ public class Progress {
     public void setUser(User user) {
         this.user = user;
     }
-    public Microlesson getMicroLesson() {
+    public MicroLesson getMicroLesson() {
         return microLesson;
     }
-    public void setMicroLesson(Microlesson microLesson) {
+    public void setMicroLesson(MicroLesson microLesson) {
         this.microLesson = microLesson;
     }
     public String getStatus() {
@@ -67,10 +74,13 @@ public class Progress {
     public void setScore(BigDecimal score) {
         this.score = score;
     }
+
+    // Constructors
     public Progress() {
     }
-    public Progress(Long id, User user, Microlesson microLesson, String status, Integer progressPercent,
-            LocalDateTime lastAccessedAt, BigDecimal score) {
+
+    public Progress(Long id, User user, MicroLesson microLesson, String status, Integer progressPercent,
+                    LocalDateTime lastAccessedAt, BigDecimal score) {
         this.id = id;
         this.user = user;
         this.microLesson = microLesson;
@@ -79,8 +89,10 @@ public class Progress {
         this.lastAccessedAt = lastAccessedAt;
         this.score = score;
     }
+
+    // Lifecycle callback
     @PrePersist
-     private void prePersist() {
+    private void prePersist() {
         if (lastAccessedAt == null) {
             lastAccessedAt = LocalDateTime.now();
         }

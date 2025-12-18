@@ -15,7 +15,7 @@ public class LessonServiceImpl implements LessonService {
     private final MicroLessonRepository lessonRepository;
     private final CourseRepository courseRepository;
 
-    // ✅ Constructor Injection (MANDATORY)
+    // ✅ Constructor Injection
     public LessonServiceImpl(
             MicroLessonRepository lessonRepository,
             CourseRepository courseRepository
@@ -48,7 +48,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public List<MicroLesson> findLessonsByFilters(String tags, String difficulty, String contentType) {
-        // ✅ MUST use repository method with exact name
+        // ✅ Repository method must exactly match this name
         return lessonRepository.findByFilters(tags, difficulty, contentType);
     }
 
