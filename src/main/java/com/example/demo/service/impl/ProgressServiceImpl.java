@@ -1,5 +1,4 @@
 package com.example.demo.service.impl;
-
 import com.example.demo.entity.Progress;
 import com.example.demo.entity.MicroLesson;
 import com.example.demo.entity.User;
@@ -18,7 +17,7 @@ public class ProgressServiceImpl implements ProgressService {
     private final UserRepository userRepository;
     private final MicroLessonRepository lessonRepository;
 
-    // ✅ Constructor Injection (MANDATORY)
+    // ✅ Constructor Injection
     public ProgressServiceImpl(
             ProgressRepository progressRepository,
             UserRepository userRepository,
@@ -45,13 +44,13 @@ public class ProgressServiceImpl implements ProgressService {
 
     @Override
     public Progress getProgress(Long userId, Long lessonId) {
-
-        return progressRepository.findByUserIdAndMicroLessonId(userId, lessonId);
+        // ✅ Extract Progress from Optional
+        return progressRepository.findByUserIdAndMicroLessonId(userId, lessonId)
+                .orElseThrow(() -> new RuntimeException("Progress not found"));
     }
 
     @Override
     public List<Progress> getUserProgress(Long userId) {
-
         return progressRepository.findByUserIdOrderByLastAccessedAtDesc(userId);
     }
 }

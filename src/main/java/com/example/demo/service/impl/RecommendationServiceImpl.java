@@ -1,19 +1,21 @@
 package com.example.demo.service.impl;
+
 import com.example.demo.entity.Recommendation;
 import com.example.demo.entity.User;
 import com.example.demo.repository.RecommendationRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.RecommendationService;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
 @Service
 public class RecommendationServiceImpl implements RecommendationService {
 
     private final RecommendationRepository recommendationRepository;
     private final UserRepository userRepository;
-
 
     public RecommendationServiceImpl(
             RecommendationRepository recommendationRepository,
@@ -34,13 +36,16 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public Recommendation getLatestRecommendation(Long userId) {
-        // ✅ MUST use exact repository method
-        return recommendationRepository.findByUserIdOrderByGeneratedAtDesc(userId);
+        // ✅ Repository returns List, extract first element
+        List<Recommendation> recommendations = recommendationRepository.findByUserIdOrderByGeneratedAtDesc(userId);
+        if (recommendations.isEmpty()) {
+            throw new RuntimeException("No recommendations found for user");
+        }
+        return recommendations.get(0); // most recent
     }
 
     @Override
     public List<Recommendation> getRecommendations(Long userId, LocalDate from, LocalDate to) {
-        // ✅ MUST use exact repository method
         LocalDateTime start = from.atStartOfDay();
         LocalDateTime end = to.atTime(23, 59, 59);
 
