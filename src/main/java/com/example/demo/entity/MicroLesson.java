@@ -29,7 +29,7 @@ public class MicroLesson {
     private String tags;
     private LocalDate publishDate;
 
-    // Getters and setters
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -54,7 +54,7 @@ public class MicroLesson {
     public LocalDate getPublishDate() { return publishDate; }
     public void setPublishDate(LocalDate publishDate) { this.publishDate = publishDate; }
 
-    // ✅ Correct constructors
+ 
     public MicroLesson() { }
 
     public MicroLesson(Long id, Course course, String title, Integer durationMinutes, String contentType,
