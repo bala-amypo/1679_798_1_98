@@ -1,8 +1,6 @@
-package com.example.demo.entity;
+package com.example.demo.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -25,32 +23,27 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 150)
+    @Column(nullable = false, length = 150)
     private String title;
 
-    @Size(max = 500)
+    @Column(length = 500)
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(nullable = false, length = 50)
+    private String category;
+
+    @ManyToOne
     @JoinColumn(name = "instructor_id", nullable = false)
     private User instructor;
 
-    @NotBlank
-    @Size(max = 50)
-    private String category;
-
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    /* ---------- Relationships ---------- */
-
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
-    private List<MicroLesson> microLessons;
-
-    /* ---------- Lifecycle ---------- */
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<MicroLesson> lessons;
 
     @PrePersist
-    public void prePersist() {
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 }

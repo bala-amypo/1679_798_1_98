@@ -1,7 +1,6 @@
-package com.example.demo.entity;
+package com.example.demo.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -19,34 +18,28 @@ public class MicroLesson {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    @NotBlank
-    @Size(max = 150)
+    @Column(nullable = false, length = 150)
     private String title;
 
-    @NotNull
-    @Positive
-    @Max(15)
+    @Column(name = "duration_minutes", nullable = false)
     private Integer durationMinutes;
 
-    @NotBlank
-    @Size(max = 50)
-    private String contentType;
+    @Column(name = "content_type", nullable = false)
+    private String contentType; // VIDEO, ARTICLE, QUIZ, INTERACTIVE
 
-    @NotBlank
-    @Size(max = 50)
-    private String difficulty;
+    @Column(nullable = false)
+    private String difficulty; // BEGINNER, INTERMEDIATE, ADVANCED
 
-    @Size(max = 500)
+    @Column(length = 500)
     private String tags;
 
-    @NotNull
+    @Column(name = "publish_date", nullable = false)
     private LocalDate publishDate;
 
-
-    @OneToMany(mappedBy = "microLesson", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "microLesson", cascade = CascadeType.ALL)
     private List<Progress> progressList;
 }

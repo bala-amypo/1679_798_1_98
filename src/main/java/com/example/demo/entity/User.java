@@ -1,15 +1,18 @@
-package com.example.demo.entity;
+package com.example.demo.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(
+    name = "users",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email")
+    }
+)
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,45 +23,36 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 100)
+    @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
-    @Email
-    @NotBlank
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank
-    @Size(min = 8)
+    @Column(nullable = false)
     private String password;
 
-    @NotBlank
-    private String role;
+    @Column(nullable = false, length = 20)
+    private String role; // LEARNER, INSTRUCTOR, ADMIN
 
-    @Size(max = 50)
+    @Column(name = "preferred_learning_style")
     private String preferredLearningStyle;
 
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    
-
-    @OneToMany(mappedBy = "instructor", fetch = FetchType.LAZY)
+    // Relationships
+    @OneToMany(mappedBy = "instructor")
     private List<Course> courses;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user")
     private List<Progress> progressList;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user")
     private List<Recommendation> recommendations;
 
-   
-
     @PrePersist
-    public void prePersist() {
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        if (this.role == null || this.role.isBlank()) {
-            this.role = "LEARNER";
-        }
     }
 }
