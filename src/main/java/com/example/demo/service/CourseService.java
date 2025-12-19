@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.Course;
+import com.example.demo.model.Course;
 
 import java.util.List;
 
