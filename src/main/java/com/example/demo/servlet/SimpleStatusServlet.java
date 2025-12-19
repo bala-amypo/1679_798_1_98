@@ -1,3 +1,4 @@
+// src/main/java/com/example/demo/servlet/SimpleStatusServlet.java
 package com.example.demo.servlet;
 
 import jakarta.servlet.http.HttpServlet;
@@ -9,11 +10,7 @@ import java.io.IOException;
 public class SimpleStatusServlet extends HttpServlet {
 
     @Override
-    protected void doGet(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/plain");
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write("Servlet Alive");
