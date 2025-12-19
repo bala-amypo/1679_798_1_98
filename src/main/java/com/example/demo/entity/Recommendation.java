@@ -1,9 +1,11 @@
-package com.example.demo.entity;
+package com.example.demo.model;
+
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "recommendations")
 @Data
@@ -16,27 +18,24 @@ public class Recommendation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name = "generated_at", updatable = false)
     private LocalDateTime generatedAt;
 
-    @NotBlank
-    @Size(max = 1000)
+    @Column(name = "recommended_lesson_ids", length = 500)
     private String recommendedLessonIds;
 
-    @Size(max = 2000)
+    @Column(name = "basis_snapshot", columnDefinition = "TEXT")
     private String basisSnapshot;
 
-    @NotNull
-    @DecimalMin("0.0")
-    @DecimalMax("1.0")
-    @Column(precision = 3, scale = 2)
+    @Column(name = "confidence_score", precision = 3, scale = 2)
     private BigDecimal confidenceScore;
 
     @PrePersist
-    public void prePersist() {
+    protected void onCreate() {
         this.generatedAt = LocalDateTime.now();
     }
 }
