@@ -1,3 +1,4 @@
+// src/main/java/com/example/demo/security/JwtUtil.java
 package com.example.demo.security;
 
 import io.jsonwebtoken.*;
@@ -9,16 +10,8 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
-    private final String secret;
-    private final Long expirationMs;
-
-    public JwtUtil(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") Long expirationMs
-    ) {
-        this.secret = secret;
-        this.expirationMs = expirationMs;
-    }
+    private final String secret = "mySecretKey12345"; // ideally move to application.properties
+    private final long expirationMs = 24 * 60 * 60 * 1000; // 24 hours
 
     public String generateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
@@ -52,9 +45,6 @@ public class JwtUtil {
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 }

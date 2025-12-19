@@ -1,8 +1,12 @@
+// src/main/java/com/example/demo/controller/LessonController.java
 package com.example.demo.controller;
 
 import com.example.demo.entity.MicroLesson;
 import com.example.demo.service.LessonService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,35 +14,39 @@ import java.util.List;
 @RestController
 @RequestMapping("/lessons")
 @Tag(name = "Lesson Management")
+@RequiredArgsConstructor
 public class LessonController {
 
     private final LessonService lessonService;
 
-    public LessonController(LessonService lessonService) {
-        this.lessonService = lessonService;
-    }
-
     @PostMapping("/course/{courseId}")
-    public MicroLesson addLesson(@PathVariable Long courseId,
-                                 @RequestBody MicroLesson lesson) {
-        return lessonService.addLesson(courseId, lesson);
+    @Operation(summary = "Add lesson to a course (INSTRUCTOR/ADMIN)")
+    public ResponseEntity<MicroLesson> addLesson(@PathVariable Long courseId,
+                                                 @RequestBody MicroLesson lesson) {
+        MicroLesson created = lessonService.addLesson(courseId, lesson);
+        return ResponseEntity.ok(created);
     }
 
     @PutMapping("/{lessonId}")
-    public MicroLesson updateLesson(@PathVariable Long lessonId,
-                                    @RequestBody MicroLesson lesson) {
-        return lessonService.updateLesson(lessonId, lesson);
+    @Operation(summary = "Update a lesson (INSTRUCTOR/ADMIN)")
+    public ResponseEntity<MicroLesson> updateLesson(@PathVariable Long lessonId,
+                                                    @RequestBody MicroLesson lesson) {
+        MicroLesson updated = lessonService.updateLesson(lessonId, lesson);
+        return ResponseEntity.ok(updated);
     }
 
     @GetMapping("/search")
-    public List<MicroLesson> searchLessons(@RequestParam(required = false) String tags,
-                                           @RequestParam(required = false) String difficulty,
-                                           @RequestParam(required = false) String contentType) {
-        return lessonService.findLessonsByFilters(tags, difficulty, contentType);
+    @Operation(summary = "Search lessons by filters")
+    public ResponseEntity<List<MicroLesson>> searchLessons(@RequestParam(required = false) String tags,
+                                                           @RequestParam(required = false) String difficulty,
+                                                           @RequestParam(required = false) String contentType) {
+        List<MicroLesson> lessons = lessonService.findLessonsByFilters(tags, difficulty, contentType);
+        return ResponseEntity.ok(lessons);
     }
 
     @GetMapping("/{lessonId}")
-    public MicroLesson getLesson(@PathVariable Long lessonId) {
-        return lessonService.getLesson(lessonId);
+    @Operation(summary = "Get lesson details by ID")
+    public ResponseEntity<MicroLesson> getLesson(@PathVariable Long lessonId) {
+        return ResponseEntity.ok(lessonService.getLesson(lessonId));
     }
 }
