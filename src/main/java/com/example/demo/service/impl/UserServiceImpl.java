@@ -1,66 +1,79 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.dto.AuthResponse;
 import com.example.demo.entity.User;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.UserRepository;
-// import com.example.demo.security.JwtUtil; 
+import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    // private final JwtUtil jwtUtil; // commented, JwtUtil not implemented yet
+    private final JwtUtil jwtUtil;
 
-    // ✅ Constructor (exact match for test cases)
-    public UserServiceImpl(
-            UserRepository userRepository,
-            BCryptPasswordEncoder passwordEncoder
-            // JwtUtil jwtUtil // commented
-    ) {
+    public UserServiceImpl(UserRepository userRepository,
+                           BCryptPasswordEncoder passwordEncoder,
+                           JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        // this.jwtUtil = jwtUtil; // commented
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
     public User register(User user) {
-        // Encode password before saving
+        if (user == null || user.getEmail() == null || user.getPassword() == null) {
+            throw new IllegalArgumentException("Invalid user data");
+        }
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        if (user.getRole() == null) {
+            user.setRole("LEARNER");
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
     @Override
-    public String login(String email, String password) {
-        User user = findByEmail(email);
+    public AuthResponse login(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid credentials"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new ResourceNotFoundException("Invalid credentials");
         }
 
-        // Prepare claims (optional, used for JWT later)
         Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
         claims.put("role", user.getRole());
 
-        // ✅ Temporary fix: return a dummy token so test cases pass
-        // return jwtUtil.generateToken(claims, email); // original, commented
-        return "dummy-token"; // dummy token
+        String token = jwtUtil.generateToken(claims, user.getEmail());
+
+        return new AuthResponse(token, user);
     }
 
     @Override
     public User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 }
