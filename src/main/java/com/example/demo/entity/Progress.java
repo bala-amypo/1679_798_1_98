@@ -1,108 +1,59 @@
 package com.example.demo.entity;
-import lombok.Builder;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 
-@Builder
 @Entity
+@Table(
+    name = "progress",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "micro_lesson_id"})
+    }
+)
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Progress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "micro_lesson_id", nullable = false)
     private MicroLesson microLesson;
 
+    @NotBlank
+    @Size(max = 20)
     private String status;
+
+    @NotNull
+    @Min(0)
+    @Max(100)
     private Integer progressPercent;
+
     private LocalDateTime lastAccessedAt;
+
+    @Column(precision = 5, scale = 2)
     private BigDecimal score;
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public User getUser() {
-        return user;
-    }
-    public void setUser(User user) {
-        this.user = user;
-    }
-    public MicroLesson getMicroLesson() {
-        return microLesson;
-    }
-    public void setMicroLesson(MicroLesson microLesson) {
-        this.microLesson = microLesson;
-    }
-    public String getStatus() {
-        return status;
-    }
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    public Integer getProgressPercent() {
-        return progressPercent;
-    }
-    public void setProgressPercent(Integer progressPercent) {
-        this.progressPercent = progressPercent;
-    }
-    public LocalDateTime getLastAccessedAt() {
-        return lastAccessedAt;
-    }
-    public void setLastAccessedAt(LocalDateTime lastAccessedAt) {
-        this.lastAccessedAt = lastAccessedAt;
-    }
-    public BigDecimal getScore() {
-        return score;
-    }
-    public void setScore(BigDecimal score) {
-        this.score = score;
-    }
+    /* ---------- Lifecycle ---------- */
 
-    // Constructors
-    public Progress() {
-    }
-
-    public Progress(Long id, User user, MicroLesson microLesson, String status, Integer progressPercent,
-                    LocalDateTime lastAccessedAt, BigDecimal score) {
-        this.id = id;
-        this.user = user;
-        this.microLesson = microLesson;
-        this.status = status;
-        this.progressPercent = progressPercent;
-        this.lastAccessedAt = lastAccessedAt;
-        this.score = score;
-    }
-
-    // Lifecycle callback
     @PrePersist
-    private void prePersist() {
-        if (lastAccessedAt == null) {
-            lastAccessedAt = LocalDateTime.now();
-        }
-        if (progressPercent != null) {
-            if (progressPercent < 0 || progressPercent > 100) {
-                throw new IllegalStateException("progressPercent must be between 0 and 100");
-            }
-        }
-        if ("COMPLETED".equals(status)) {
-            progressPercent = 100;
+    public void prePersist() {
+        this.lastAccessedAt = LocalDateTime.now();
+        if (this.status == null || this.status.isBlank()) {
+            this.status = "NOT_STARTED";
+            this.progressPercent = 0;
         }
     }
 }
