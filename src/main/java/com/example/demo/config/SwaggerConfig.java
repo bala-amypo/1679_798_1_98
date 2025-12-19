@@ -1,20 +1,31 @@
 package com.example.demo.config;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.servers.Server;
-import org.springframework.context.annotation.Bean;
+import io.swagger.v3.oas.models.*;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.*;
 import org.springframework.context.annotation.Configuration;
-import java.util.List;
+import org.springframework.context.annotation.Bean;
 
 @Configuration
 public class SwaggerConfig {
 
     @Bean
-    public OpenAPI customOpenAPI() {
+    public OpenAPI openAPI() {
         return new OpenAPI()
-                // You need to change the port as per your server
-                .servers(List.of(
-                        new Server().url("https://9080.408procr.amypo.ai/")
-                ));
-        }
+            .info(new Info()
+                .title("Micro-Learning Content Recommendation API")
+                .description("REST API for micro-learning content and personalized recommendations")
+                .version("1.0.0")
+            )
+            .addSecurityItem(new SecurityRequirement().addList("JWT"))
+            .components(new Components()
+                .addSecuritySchemes("JWT",
+                    new SecurityScheme()
+                        .name("JWT")
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                )
+            );
+    }
 }
