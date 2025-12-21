@@ -1,77 +1,81 @@
 package com.example.demo.entity;
+
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import lombok.Builder;
 
 @Entity
-@Table(name="recommendations")
-@Builder
+@Table(name = "recommendations")
 public class Recommendation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    // MANY recommendations → ONE user
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Column(nullable = false)
     private LocalDateTime generatedAt;
+
+    @Column(nullable = false, length = 2000)
     private String recommendedLessonIds;
+
+    @Column(length = 3000)
     private String basisSnapshot;
+
+    @Column(nullable = false, precision = 3, scale = 2)
     private BigDecimal confidenceScore;
+
+    public Recommendation() {
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.generatedAt = LocalDateTime.now();
+    }
+
+    // ---------- Getters & Setters ----------
+
     public Long getId() {
         return id;
     }
-    public void setId(Long id) {
-        this.id = id;
-    }
+
     public User getUser() {
         return user;
     }
+
     public void setUser(User user) {
         this.user = user;
     }
+
     public LocalDateTime getGeneratedAt() {
         return generatedAt;
     }
-    public void setGeneratedAt(LocalDateTime generatedAt) {
-        this.generatedAt = generatedAt;
-    }
+
     public String getRecommendedLessonIds() {
         return recommendedLessonIds;
     }
+
     public void setRecommendedLessonIds(String recommendedLessonIds) {
         this.recommendedLessonIds = recommendedLessonIds;
     }
+
     public String getBasisSnapshot() {
         return basisSnapshot;
     }
+
     public void setBasisSnapshot(String basisSnapshot) {
         this.basisSnapshot = basisSnapshot;
     }
+
     public BigDecimal getConfidenceScore() {
         return confidenceScore;
     }
+
     public void setConfidenceScore(BigDecimal confidenceScore) {
         this.confidenceScore = confidenceScore;
-    }
-    public Recommendation() {
-    }
-    public Recommendation(Long id, User user, LocalDateTime generatedAt, String recommendedLessonIds,
-            String basisSnapshot, BigDecimal confidenceScore) {
-        this.id = id;
-        this.user = user;
-        this.generatedAt = generatedAt;
-        this.recommendedLessonIds = recommendedLessonIds;
-        this.basisSnapshot = basisSnapshot;
-        this.confidenceScore = confidenceScore;
-    }
-    @PrePersist
-    protected void onCreate() {
-        if (generatedAt == null) {
-            generatedAt = LocalDateTime.now();
-        }
     }
 }

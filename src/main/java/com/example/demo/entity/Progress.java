@@ -12,18 +12,16 @@ public class Progress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // MANY progress rows → ONE user
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // MANY progress rows → ONE micro lesson
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "micro_lesson_id", nullable = false)
     private MicroLesson microLesson;
 
     @Column(nullable = false)
-    private String status; // NOT_STARTED, IN_PROGRESS, COMPLETED
+    private String status;
 
     @Column(nullable = false)
     private Integer progressPercent;
@@ -34,27 +32,5 @@ public class Progress {
     @Column
     private BigDecimal score;
 
-    public Progress() {
-    }
-
-    // getters & setters
-    public Long getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public MicroLesson getMicroLesson() {
-        return microLesson;
-    }
-
-    public void setMicroLesson(MicroLesson microLesson) {
-        this.microLesson = microLesson;
-    }
+    public Progress() {}
 }
