@@ -1,15 +1,13 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Progress;
+import com.example.demo.entity.Progress;
 import com.example.demo.service.ProgressService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/progress")
-@Tag(name = "Progress")
 public class ProgressController {
 
     private final ProgressService progressService;
@@ -18,26 +16,18 @@ public class ProgressController {
         this.progressService = progressService;
     }
 
-    // POST /progress/{lessonId}?userId=1
     @PostMapping("/{lessonId}")
-    public Progress recordProgress(
+    public Progress record(
             @PathVariable Long lessonId,
-            @RequestParam Long userId,
-            @RequestBody Progress progress
-    ) {
-        return progressService.recordProgress(userId, lessonId, progress);
+            @RequestBody Progress progress) {
+        return progressService.recordProgress(1L, lessonId, progress);
     }
 
-    // GET /progress/lesson/{lessonId}?userId=1
     @GetMapping("/lesson/{lessonId}")
-    public Progress getProgress(
-            @PathVariable Long lessonId,
-            @RequestParam Long userId
-    ) {
-        return progressService.getProgress(userId, lessonId);
+    public Progress getProgress(@PathVariable Long lessonId) {
+        return progressService.getProgress(1L, lessonId);
     }
 
-    // GET /progress/user/{userId}
     @GetMapping("/user/{userId}")
     public List<Progress> getUserProgress(@PathVariable Long userId) {
         return progressService.getUserProgress(userId);
