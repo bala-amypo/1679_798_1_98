@@ -1,4 +1,5 @@
 package com.example.demo.entity;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -13,27 +14,28 @@ public class Course {
     @Column(nullable = false)
     private String title;
 
+    @Column
     private String description;
+
+    @Column
     private String category;
 
     @ManyToOne
     @JoinColumn(name = "instructor_id")
     private User instructor;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    void onCreate() {
-        createdAt = LocalDateTime.now();
+    public Course() {
     }
 
-    public Course() {}
-    
-}
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
-
-    // ---------- Getters & Setters ----------
-
+    // getters and setters
     public Long getId() {
         return id;
     }
@@ -58,20 +60,20 @@ public class Course {
         this.description = description;
     }
 
-    public User getInstructor() {
-        return instructor;
-    }
-
-    public void setInstructor(User instructor) {
-        this.instructor = instructor;
-    }
-
     public String getCategory() {
         return category;
     }
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public User getInstructor() {
+        return instructor;
+    }
+
+    public void setInstructor(User instructor) {
+        this.instructor = instructor;
     }
 
     public LocalDateTime getCreatedAt() {
