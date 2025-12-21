@@ -1,29 +1,19 @@
-
 package com.example.demo.config;
-import io.swagger.v3.oas.models.Components;
+
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 @Configuration
 public class SwaggerConfig {
+
     @Bean
-    public OpenAPI api() {
-        final String securitySchemeName = "JWT";
+    public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Micro-Learning Content Recommendation API")
-                        .version("1.0.0")
-                        .description("REST API for micro-learning content and personalized recommendations"))
-                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
-                .components(new Components()
-                        .addSecuritySchemes(securitySchemeName,
-                                new SecurityScheme()
-                                        .name(securitySchemeName)
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")));
+                        .title("Demo Application API")
+                        .version("1.0")
+                        .description("Swagger UI for Demo Application (No Security, No Auth)"));
     }
 }
