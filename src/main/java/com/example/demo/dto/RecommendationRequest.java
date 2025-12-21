@@ -1,10 +1,19 @@
 package com.example.demo.dto;
 
-public class RecommendationRequest {
-    private String difficulty;
-    private String tags;
-    private Integer maxItems;
+import java.math.BigDecimal;
 
-    public RecommendationRequest() {}
-    // getters & setters
+public class RecommendationRequest {
+
+    private BigDecimal confidenceScore;
+
+    public RecommendationRequest() {
+    }
+
+    public BigDecimal getConfidenceScore() {
+        return confidenceScore;
+    }
+
+    public void setConfidenceScore(BigDecimal confidenceScore) {
+        this.confidenceScore = confidenceScore;
+    }
 }
