@@ -1,17 +1,6 @@
 package com.example.demo.entity;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "courses")
@@ -24,41 +13,24 @@ public class Course {
     @Column(nullable = false)
     private String title;
 
-    @Column(length = 1000)
     private String description;
-
-    // MANY courses -> ONE instructor
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "instructor_id", nullable = false)
-    private User instructor;
-
-    @Column(nullable = false)
     private String category;
 
-    @Column(nullable = false, updatable = false)
+    @ManyToOne
+    @JoinColumn(name = "instructor_id")
+    private User instructor;
+
     private LocalDateTime createdAt;
 
-    // ---------- Constructors ----------
-
-    public Course() {
-    }
-
-    public Course(Long id, String title, String description, User instructor, String category,
-            LocalDateTime createdAt) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.instructor = instructor;
-        this.category = category;
-        this.createdAt = createdAt;
-    }
-
-    // ---------- Lifecycle ----------
-
     @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+    void onCreate() {
+        createdAt = LocalDateTime.now();
     }
+
+    public Course() {}
+    
+}
+
 
     // ---------- Getters & Setters ----------
 
