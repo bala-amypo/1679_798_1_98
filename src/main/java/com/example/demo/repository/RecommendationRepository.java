@@ -1,18 +1,13 @@
 package com.example.demo.repository;
 
-import com.example.demo.model.Recommendation;
+import com.example.demo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
 
-public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    List<Recommendation> findByUserIdAndGeneratedAtBetween(
-            Long userId,
-            LocalDateTime start,
-            LocalDateTime end
-    );
+    boolean existsByEmail(String email);
 
-    List<Recommendation> findByUserIdOrderByGeneratedAtDesc(Long userId);
+    Optional<User> findByEmail(String email);
 }
