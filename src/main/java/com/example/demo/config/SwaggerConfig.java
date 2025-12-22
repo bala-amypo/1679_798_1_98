@@ -11,6 +11,8 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
+        Server server = new Server();
+        server.setUrl("https://your-preview-link");
                 .info(new Info()
                         .title("Demo Application API")
                         .version("1.0")
