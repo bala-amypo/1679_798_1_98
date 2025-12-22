@@ -12,7 +12,7 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
         Server server = new Server();
-        server.setUrl("https://your-preview-link");
+        server.setUrl("https://9088.408procr.amypo.ai/");
                 .info(new Info()
                         .title("Demo Application API")
                         .version("1.0")
