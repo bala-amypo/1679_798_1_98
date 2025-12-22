@@ -1,5 +1,4 @@
 package com.example.demo.dto;
-
 import java.math.BigDecimal;
 
 public class RecommendationRequest {
