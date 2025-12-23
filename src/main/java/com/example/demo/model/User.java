@@ -42,11 +42,25 @@ public class User {
         }
     }
 
+    // Convenience constructor (without id and createdAt)
     public User(String fullName, String email, String password, String role, String preferredLearningStyle) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.role = (role == null || role.isBlank()) ? "LEARNER" : role;
         this.preferredLearningStyle = preferredLearningStyle;
+    }
+
+    // Optional helper methods for JWT or security
+    public boolean isAdmin() {
+        return "ADMIN".equalsIgnoreCase(this.role);
+    }
+
+    public boolean isInstructor() {
+        return "INSTRUCTOR".equalsIgnoreCase(this.role);
+    }
+
+    public boolean isLearner() {
+        return "LEARNER".equalsIgnoreCase(this.role);
     }
 }

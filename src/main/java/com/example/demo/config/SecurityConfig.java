@@ -21,17 +21,20 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
     }
 
+    // Password encoder bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // Authentication manager bean
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
+    // Security filter chain
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -41,20 +44,21 @@ public class SecurityConfig {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
 
-                // 🔓 AUTH
+                // 🔓 Public endpoints
                 .requestMatchers("/auth/**").permitAll()
 
-                // 🔓 SWAGGER
+                // 🔓 Swagger endpoints
                 .requestMatchers(
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/swagger-ui.html"
                 ).permitAll()
 
-                // 🔐 EVERYTHING ELSE
+                // 🔐 All other endpoints need authentication
                 .anyRequest().authenticated()
             );
 
+        // Add JWT filter before UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
