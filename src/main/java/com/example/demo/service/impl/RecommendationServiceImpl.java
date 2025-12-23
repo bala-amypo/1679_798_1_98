@@ -19,24 +19,27 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     @Override
-    public List<Recommendation> getRecommendations(Long userId, LocalDate start, LocalDate end) {
-        return recommendationRepository.findByUserIdAndDateBetween(userId, start, end);
-    }
-
-    @Override
-    public Recommendation getLatestRecommendation(Long userId) {
-        return recommendationRepository.findTopByUserIdOrderByGeneratedAtDesc(userId);
-    }
-
-    @Override
     public Recommendation generateRecommendation(long userId, RecommendationRequest req) {
+
+        // Convert List<String> tags to comma-separated string
+        String tags = String.join(",", req.getTags());
+
         Recommendation recommendation = Recommendation.builder()
                 .userId(userId)
-                .tags(req.getTags())
+                .tags(tags)
                 .difficulty(req.getDifficulty())
                 .contentType(req.getContentType())
                 .generatedAt(LocalDate.now())
                 .build();
+
         return recommendationRepository.save(recommendation);
+    }
+
+    @Override
+    public Recommendation getLatestRecommendation(Long userId) {
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.minusDays(7); // example: last 7 days
+        List<Recommendation> recs = recommendationRepository.findByUserIdAndDateBetween(userId, startDate, today);
+        return recs.isEmpty() ? null : recs.get(recs.size() - 1);
     }
 }
