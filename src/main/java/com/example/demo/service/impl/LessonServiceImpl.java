@@ -1,10 +1,10 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.model.MicroLesson;
 import com.example.demo.model.Course;
-import com.example.demo.repository.MicroLessonRepository;
+import com.example.demo.model.MicroLesson;
 import com.example.demo.repository.CourseRepository;
+import com.example.demo.repository.MicroLessonRepository;
 import com.example.demo.service.LessonService;
 import org.springframework.stereotype.Service;
 
@@ -34,9 +34,8 @@ public class LessonServiceImpl implements LessonService {
             throw new IllegalArgumentException("Lesson duration must be between 1 and 15 minutes");
         }
 
-        // ✅ FIX: relationship is object-based, not ID-based
+        // ✅ FIXED
         lesson.setCourse(course);
-
         return microLessonRepository.save(lesson);
     }
 
@@ -74,20 +73,16 @@ public class LessonServiceImpl implements LessonService {
         if (lesson.getTitle() != null) {
             existing.setTitle(lesson.getTitle());
         }
-
         if (lesson.getContentType() != null) {
             existing.setContentType(lesson.getContentType());
         }
-
         if (lesson.getDifficulty() != null) {
             existing.setDifficulty(lesson.getDifficulty());
         }
-
-        // ✅ FIX: field name is "tags", not "tag"
+        // ✅ FIXED
         if (lesson.getTags() != null) {
             existing.setTags(lesson.getTags());
         }
-
         if (lesson.getDurationMinutes() != null && lesson.getDurationMinutes() > 0) {
             existing.setDurationMinutes(lesson.getDurationMinutes());
         }

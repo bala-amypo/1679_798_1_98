@@ -1,74 +1,67 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.dto.AuthResponse;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtUtil;
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.service.UserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public UserServiceImpl(UserRepository userRepository, JwtUtil jwtUtil, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository,
+                           BCryptPasswordEncoder passwordEncoder,
+                           JwtUtil jwtUtil) {
         this.userRepository = userRepository;
-        this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public User register(User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRole() == null) {
+            user.setRole("LEARNER");
+        }
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public AuthResponse login(String email, String password) {
+        User user = findByEmail(email);
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+
+        String token = jwtUtil.generateToken(user);
+
+        return new AuthResponse(token, user.getId(), user.getEmail(), user.getRole(), "Login successful");
     }
 
     @Override
     public User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
     }
 
     @Override
-    public User save(User user) {
-        return userRepository.save(user);
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
-        }
-        userRepository.deleteById(id);
-    }
-
-    @Override
-    public User register(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already in use");
-        }
-        if (user.getRole() == null || user.getRole().isEmpty()) {
-            user.setRole("LEARNER");
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
-    }
-
-    public AuthResponse login(String email, String rawPassword) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
-
-        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-            throw new IllegalArgumentException("Invalid password");
-        }
-
-        String token = jwtUtil.generateToken(email);
-        return new AuthResponse(token);
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
     }
 }
