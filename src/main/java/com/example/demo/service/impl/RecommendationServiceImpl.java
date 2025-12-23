@@ -1,60 +1,55 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.RecommendationRequest;
-import com.example.demo.entity.Recommendation;
-import com.example.demo.entity.User;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.model.MicroLesson;
+import com.example.demo.model.Recommendation;
+import com.example.demo.repository.MicroLessonRepository;
 import com.example.demo.repository.RecommendationRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.RecommendationService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RecommendationServiceImpl implements RecommendationService {
 
     private final RecommendationRepository recommendationRepository;
     private final UserRepository userRepository;
+    private final MicroLessonRepository microLessonRepository;
 
-    public RecommendationServiceImpl(
-            RecommendationRepository recommendationRepository,
-            UserRepository userRepository) {
+    public RecommendationServiceImpl(RecommendationRepository recommendationRepository,
+                                     UserRepository userRepository,
+                                     MicroLessonRepository microLessonRepository) {
         this.recommendationRepository = recommendationRepository;
         this.userRepository = userRepository;
+        this.microLessonRepository = microLessonRepository;
     }
 
     @Override
-    public Recommendation generateRecommendation(Long userId, RecommendationRequest request) {
+    public Recommendation generateRecommendation(Long userId, RecommendationRequest req) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        List<MicroLesson> lessons = microLessonRepository.findByFilters(
+                req.getTags(),
+                req.getDifficulty(),
+                req.getContentType()
+        );
 
-        Recommendation recommendation = new Recommendation();
-        recommendation.setUser(user);
-        recommendation.setRecommendedLessonIds("1,2,3");
-        recommendation.setBasisSnapshot("AUTO_GENERATED");
-        recommendation.setConfidenceScore(request.getConfidenceScore());
+        String ids = lessons.stream()
+                .map(l -> String.valueOf(l.getId()))
+                .collect(Collectors.joining(","));
+
+        Recommendation recommendation = Recommendation.builder()
+                .recommendedLessonIds(ids)
+                .basisSnapshot("Generated")
+                .confidenceScore(BigDecimal.valueOf(0.8))
+                .build();
 
         return recommendationRepository.save(recommendation);
-    }
-
-    @Override
-    public Recommendation getLatestRecommendation(Long userId) {
-        return recommendationRepository
-                .findByUserIdOrderByGeneratedAtDesc(userId)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No recommendations found"));
-    }
-
-    @Override
-    public List<Recommendation> getRecommendations(Long userId, LocalDate from, LocalDate to) {
-
-        LocalDateTime start = from != null ? from.atStartOfDay() : LocalDateTime.MIN;
-        LocalDateTime end = to != null ? to.atTime(23, 59, 59) : LocalDateTime.now();
-
-        return recommendationRepository.findByUserIdAndGeneratedAtBetween(userId, start, end);
     }
 }

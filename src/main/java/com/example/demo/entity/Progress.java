@@ -88,4 +88,8 @@ public class Progress {
     public LocalDateTime getLastAccessedAt() {
         return lastAccessedAt;
     }
+    @PrePersist
+public void onAccess() {
+    this.lastAccessedAt = LocalDateTime.now();
+}
 }

@@ -1,8 +1,9 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.entity.MicroLesson;
-import com.example.demo.entity.Progress;
-import com.example.demo.entity.User;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.model.MicroLesson;
+import com.example.demo.model.Progress;
+import com.example.demo.model.User;
 import com.example.demo.repository.MicroLessonRepository;
 import com.example.demo.repository.ProgressRepository;
 import com.example.demo.repository.UserRepository;
@@ -18,10 +19,9 @@ public class ProgressServiceImpl implements ProgressService {
     private final UserRepository userRepository;
     private final MicroLessonRepository microLessonRepository;
 
-    public ProgressServiceImpl(
-            ProgressRepository progressRepository,
-            UserRepository userRepository,
-            MicroLessonRepository microLessonRepository) {
+    public ProgressServiceImpl(ProgressRepository progressRepository,
+                               UserRepository userRepository,
+                               MicroLessonRepository microLessonRepository) {
         this.progressRepository = progressRepository;
         this.userRepository = userRepository;
         this.microLessonRepository = microLessonRepository;
@@ -29,19 +29,31 @@ public class ProgressServiceImpl implements ProgressService {
 
     @Override
     public Progress recordProgress(Long userId, Long lessonId, Progress progress) {
-
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         MicroLesson lesson = microLessonRepository.findById(lessonId)
-                .orElseThrow(() -> new RuntimeException("Lesson not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
+
+        if (progress.getProgressPercent() < 0 || progress.getProgressPercent() > 100) {
+            throw new IllegalArgumentException("Invalid progress percent");
+        }
+
+        if ("COMPLETED".equals(progress.getStatus()) &&
+                progress.getProgressPercent() != 100) {
+            throw new IllegalArgumentException("Completed must be 100%");
+        }
 
         Progress existing = progressRepository
                 .findByUserIdAndMicroLessonId(userId, lessonId)
-                .orElse(new Progress());
+                .orElse(null);
 
-        existing.setUser(user);
-        existing.setMicroLesson(lesson);
+        if (existing == null) {
+            progress.setUser(user);
+            progress.setMicroLesson(lesson);
+            return progressRepository.save(progress);
+        }
+
         existing.setStatus(progress.getStatus());
         existing.setProgressPercent(progress.getProgressPercent());
         existing.setScore(progress.getScore());
@@ -52,7 +64,7 @@ public class ProgressServiceImpl implements ProgressService {
     @Override
     public Progress getProgress(Long userId, Long lessonId) {
         return progressRepository.findByUserIdAndMicroLessonId(userId, lessonId)
-                .orElseThrow(() -> new RuntimeException("Progress not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Progress not found"));
     }
 
     @Override
