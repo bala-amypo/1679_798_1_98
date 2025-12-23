@@ -40,8 +40,13 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
+    @Override
+    public User register(User user) {
+        // Simple register logic
+        return userRepository.save(user);
+    }
+
     public AuthResponse login(User user) {
-        // Assuming JwtUtil expects a String (email)
         String token = jwtUtil.generateToken(user.getEmail());
         return new AuthResponse(token);
     }

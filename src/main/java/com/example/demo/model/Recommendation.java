@@ -1,81 +1,32 @@
 package com.example.demo.model;
-import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.Builder;
+
+import java.util.List;
 
 @Entity
-@Table(name = "recommendations")
+@Builder
 public class Recommendation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private List<String> tags;
+    private String difficulty;
+    private String contentType;
 
-    @Column(nullable = false)
-    private LocalDateTime generatedAt;
+    // Getters and setters
+    public List<String> getTags() { return tags; }
+    public void setTags(List<String> tags) { this.tags = tags; }
 
-    @Column(nullable = false)
-    private String recommendedLessonIds;
+    public String getDifficulty() { return difficulty; }
+    public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
 
-    @Column
-    private String basisSnapshot;
-
-    @Column(nullable = false)
-    private BigDecimal confidenceScore;
-
-    public Recommendation() {
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.generatedAt = LocalDateTime.now();
-    }
-
-    // getters & setters
-    public Long getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public LocalDateTime getGeneratedAt() {
-        return generatedAt;
-    }
-
-    public String getRecommendedLessonIds() {
-        return recommendedLessonIds;
-    }
-
-    public void setRecommendedLessonIds(String recommendedLessonIds) {
-        this.recommendedLessonIds = recommendedLessonIds;
-    }
-
-    public String getBasisSnapshot() {
-        return basisSnapshot;
-    }
-
-    public void setBasisSnapshot(String basisSnapshot) {
-        this.basisSnapshot = basisSnapshot;
-    }
-
-    public BigDecimal getConfidenceScore() {
-        return confidenceScore;
-    }
-
-    public void setConfidenceScore(BigDecimal confidenceScore) {
-        this.confidenceScore = confidenceScore;
-    }
-    @PrePersist
-    public void onGenerate() {
-    this.generatedAt = LocalDateTime.now();
-}
+    public String getContentType() { return contentType; }
+    public void setContentType(String contentType) { this.contentType = contentType; }
 }

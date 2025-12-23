@@ -8,4 +8,7 @@ public interface UserService {
     User findById(Long id);
     User save(User user);
     void deleteById(Long id);
+
+    // Added register method
+    User register(User user);
 }
