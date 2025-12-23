@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Progress;
+import com.example.demo.model.Progress;
 import com.example.demo.service.ProgressService;
 import org.springframework.web.bind.annotation.*;
 

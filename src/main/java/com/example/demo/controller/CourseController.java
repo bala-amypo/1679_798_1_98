@@ -1,5 +1,5 @@
 package com.example.demo.controller;
-import com.example.demo.entity.Course;
+import com.example.demo.model.Course;
 import com.example.demo.repository.CourseRepository;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
