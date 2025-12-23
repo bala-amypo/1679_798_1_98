@@ -6,6 +6,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
-    List<Recommendation> findByUserIdAndDateBetween(Long userId, LocalDate start, LocalDate end);
+    List<Recommendation> findByUserIdAndGeneratedAtBetween(Long userId, LocalDate start, LocalDate end);
     Recommendation findTopByUserIdOrderByGeneratedAtDesc(Long userId);
 }

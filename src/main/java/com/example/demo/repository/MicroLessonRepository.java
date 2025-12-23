@@ -1,3 +1,4 @@
+
 package com.example.demo.repository;
 
 import com.example.demo.model.MicroLesson;
@@ -11,12 +12,12 @@ public interface MicroLessonRepository extends JpaRepository<MicroLesson, Long> 
 
     @Query("""
         SELECT m FROM MicroLesson m
-        WHERE (:tags IS NULL OR m.tags LIKE %:tags%)
+        WHERE (:tag IS NULL OR m.tag LIKE %:tag%)
           AND (:difficulty IS NULL OR m.difficulty = :difficulty)
           AND (:contentType IS NULL OR m.contentType = :contentType)
     """)
     List<MicroLesson> findByFilters(
-            @Param("tags") String tags,
+            @Param("tag") String tag,
             @Param("difficulty") String difficulty,
             @Param("contentType") String contentType
     );
