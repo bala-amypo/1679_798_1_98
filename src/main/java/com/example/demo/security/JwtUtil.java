@@ -32,9 +32,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    /**
-     * Validate JWT token
-     */
+    
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
@@ -44,9 +42,6 @@ public class JwtUtil {
         }
     }
 
-    /**
-     * Extract email (subject) from token
-     */
     public String getEmailFromToken(String token) {
         try {
             return Jwts.parserBuilder()
