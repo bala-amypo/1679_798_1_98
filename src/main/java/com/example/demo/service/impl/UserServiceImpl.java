@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
     }
-UserServiceImpl.java: String token = jwtUtil.generateToken(user.getEmail());
+
     @Override
     public void deleteById(Long id) {
         userRepository.deleteById(id);
