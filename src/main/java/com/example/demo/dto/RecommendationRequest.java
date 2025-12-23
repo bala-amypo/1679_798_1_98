@@ -4,40 +4,17 @@ import java.util.List;
 
 public class RecommendationRequest {
 
-    private List<String> tags;
-    private String difficulty;
-    private String contentType;
+    private List<String> lessonIds;
+    private String basisSnapshot;
+    private Double confidenceScore;
 
-    public RecommendationRequest() {
-    }
+    // Getters and setters
+    public List<String> getLessonIds() { return lessonIds; }
+    public void setLessonIds(List<String> lessonIds) { this.lessonIds = lessonIds; }
 
-    public RecommendationRequest(List<String> tags, String difficulty, String contentType) {
-        this.tags = tags;
-        this.difficulty = difficulty;
-        this.contentType = contentType;
-    }
+    public String getBasisSnapshot() { return basisSnapshot; }
+    public void setBasisSnapshot(String basisSnapshot) { this.basisSnapshot = basisSnapshot; }
 
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
-
-    public String getDifficulty() {
-        return difficulty;
-    }
-
-    public void setDifficulty(String difficulty) {
-        this.difficulty = difficulty;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
+    public Double getConfidenceScore() { return confidenceScore; }
+    public void setConfidenceScore(Double confidenceScore) { this.confidenceScore = confidenceScore; }
 }

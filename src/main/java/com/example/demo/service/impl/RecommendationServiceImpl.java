@@ -1,26 +1,24 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.RecommendationRequest;
-import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Recommendation;
 import com.example.demo.repository.RecommendationRepository;
 import com.example.demo.service.RecommendationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class RecommendationServiceImpl implements RecommendationService {
 
-    private final RecommendationRepository recommendationRepository;
-
-    public RecommendationServiceImpl(RecommendationRepository recommendationRepository) {
-        this.recommendationRepository = recommendationRepository;
-    }
+    @Autowired
+    private RecommendationRepository recommendationRepository;
 
     @Override
-    public Recommendation generateRecommendation(long userId, RecommendationRequest request) {
+    public Recommendation generateRecommendation(Long userId, RecommendationRequest request) {
         Recommendation recommendation = new Recommendation();
         recommendation.setUserId(userId);
         recommendation.setGeneratedAt(LocalDateTime.now());
@@ -34,11 +32,14 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     public Recommendation getLatestRecommendation(Long userId) {
         return recommendationRepository.findTopByUserIdOrderByGeneratedAtDesc(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("No recommendation found for user: " + userId));
+                .orElse(null);
     }
 
     @Override
-    public List<Recommendation> getRecommendationsForUser(Long userId) {
-        return recommendationRepository.findByUserId(userId);
+    public List<Recommendation> getRecommendations(Long userId, LocalDate startDate, LocalDate endDate) {
+        return recommendationRepository.findByUserId(userId).stream()
+                .filter(r -> !r.getGeneratedAt().toLocalDate().isBefore(startDate)
+                        && !r.getGeneratedAt().toLocalDate().isAfter(endDate))
+                .toList();
     }
 }
