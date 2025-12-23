@@ -1,25 +1,20 @@
 package com.example.demo.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import java.util.List;
 
 @Configuration
 public class SwaggerConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        Server server = new Server();
-        server.setUrl("https://9088.408procr.amypo.ai/");
-        server.setDescription("College portal preview URL");
-
         return new OpenAPI()
-                .addServersItem(server)
-                .info(new Info()
-                        .title("Demo Application API")
-                        .version("1.0")
-                        .description("Swagger UI for Demo Application"));
-    }
+                // You need to change the port as per your server
+                .servers(List.of(
+                        new Server().url("https://9204.pro604cr.amypo.ai/")
+                ));
+        }
 }
