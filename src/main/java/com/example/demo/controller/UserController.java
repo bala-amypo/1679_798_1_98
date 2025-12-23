@@ -1,5 +1,4 @@
 package com.example.demo.controller;
-
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
