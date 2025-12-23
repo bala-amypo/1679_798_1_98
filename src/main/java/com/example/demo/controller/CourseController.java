@@ -23,35 +23,34 @@ public class CourseController {
     @Operation(summary = "Get all courses")
     @GetMapping
     public ResponseEntity<List<Course>> getAllCourses() {
-        List<Course> courses = courseService.getAllCourses();
-        return ResponseEntity.ok(courses);
+        return ResponseEntity.ok(courseService.getAllCourses());
     }
 
-    @Operation(summary = "Create a new course")
+    @Operation(summary = "Create a new course for an instructor")
     @PostMapping
-    public ResponseEntity<Course> createCourse(@RequestBody Course course, @RequestParam Long instructorId) {
-        Course created = courseService.createCourse(course, instructorId);
-        return ResponseEntity.ok(created);
+    public ResponseEntity<Course> createCourse(
+            @RequestBody Course course,
+            @RequestParam Long instructorId) {
+        return ResponseEntity.ok(courseService.createCourse(course, instructorId));
     }
 
     @Operation(summary = "Get course by ID")
     @GetMapping("/{id}")
     public ResponseEntity<Course> getCourse(@PathVariable Long id) {
-        Course course = courseService.getCourse(id);
-        return ResponseEntity.ok(course);
+        return ResponseEntity.ok(courseService.getCourse(id));
     }
 
     @Operation(summary = "Update course by ID")
     @PutMapping("/{id}")
-    public ResponseEntity<Course> updateCourse(@PathVariable Long id, @RequestBody Course course) {
-        Course updated = courseService.updateCourse(id, course);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<Course> updateCourse(
+            @PathVariable Long id,
+            @RequestBody Course course) {
+        return ResponseEntity.ok(courseService.updateCourse(id, course));
     }
 
     @Operation(summary = "Get courses by instructor ID")
     @GetMapping("/instructor/{instructorId}")
     public ResponseEntity<List<Course>> getCoursesByInstructor(@PathVariable Long instructorId) {
-        List<Course> courses = courseService.listCoursesByInstructor(instructorId);
-        return ResponseEntity.ok(courses);
+        return ResponseEntity.ok(courseService.listCoursesByInstructor(instructorId));
     }
 }
