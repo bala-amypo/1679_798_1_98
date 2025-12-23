@@ -20,9 +20,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public Recommendation generateRecommendation(long userId, RecommendationRequest req) {
-
-        // Convert List<String> tags to comma-separated string
-        String tags = String.join(",", req.getTags());
+        String tags = req.getTags() != null ? String.join(",", req.getTags()) : "";
 
         Recommendation recommendation = Recommendation.builder()
                 .userId(userId)
@@ -37,9 +35,13 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public Recommendation getLatestRecommendation(Long userId) {
-        LocalDate today = LocalDate.now();
-        LocalDate startDate = today.minusDays(7); // example: last 7 days
-        List<Recommendation> recs = recommendationRepository.findByUserIdAndDateBetween(userId, startDate, today);
-        return recs.isEmpty() ? null : recs.get(recs.size() - 1);
+        return recommendationRepository.findTopByUserIdOrderByGeneratedAtDesc(userId);
+    }
+
+    @Override
+    public List<Recommendation> getRecommendations(Long userId, LocalDate start, LocalDate end) {
+        if (start == null) start = LocalDate.now().minusDays(30);
+        if (end == null) end = LocalDate.now();
+        return recommendationRepository.findByUserIdAndGeneratedAtBetween(userId, start, end);
     }
 }
