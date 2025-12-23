@@ -21,7 +21,7 @@ public class Progress {
     private MicroLesson microLesson;
 
     @Column(nullable = false)
-    private String status; // NOT_STARTED, IN_PROGRESS, COMPLETED
+    private String status;
 
     @Column(nullable = false)
     private Integer progressPercent;
@@ -32,15 +32,14 @@ public class Progress {
     @Column(nullable = false)
     private LocalDateTime lastAccessedAt;
 
-    public Progress() {
-    }
+    public Progress() {}
 
     @PrePersist
     protected void onCreate() {
         this.lastAccessedAt = LocalDateTime.now();
     }
 
-    // getters & setters
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -88,8 +87,8 @@ public class Progress {
     public LocalDateTime getLastAccessedAt() {
         return lastAccessedAt;
     }
-    @PrePersist
-public void onAccess() {
-    this.lastAccessedAt = LocalDateTime.now();
-}
+
+    public void setLastAccessedAt(LocalDateTime lastAccessedAt) {
+        this.lastAccessedAt = lastAccessedAt;
+    }
 }
