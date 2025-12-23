@@ -1,8 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.AuthRequest;
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.dto.ApiResponse;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-@Tag(name = "UserController", description = "Handles user registration, login, and retrieval")
+@Tag(name = "UserController", description = "Handles basic user operations")
 public class UserController {
 
     private final UserService userService;
@@ -25,17 +22,9 @@ public class UserController {
 
     @Operation(summary = "Register a new user")
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse> register(@RequestBody User user) {
+    public ResponseEntity<User> register(@RequestBody User user) {
         User createdUser = userService.register(user);
-        ApiResponse response = new ApiResponse(true, "User registered successfully", createdUser);
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "Login a user")
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-        AuthResponse authResponse = userService.login(request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(authResponse);
+        return ResponseEntity.ok(createdUser);
     }
 
     @Operation(summary = "Get all users")
