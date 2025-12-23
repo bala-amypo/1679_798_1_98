@@ -1,12 +1,9 @@
 package com.example.demo.config;
 
-import com.example.demo.security.CustomUserDetailsService;
 import com.example.demo.security.JwtFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,44 +15,46 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private final JwtFilter jwtFilter;
 
-    @Autowired
-    private JwtFilter jwtFilter;
+    public SecurityConfig(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
 
-    // Password encoder bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Authentication provider
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
-    // Authentication manager bean
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
-
-    // Security filter chain configuration
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()  // allow register/login
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // Add JWT filter before Spring Security's UsernamePasswordAuthenticationFilter
+        http
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session ->
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+
+                // 🔓 AUTH
+                .requestMatchers("/auth/**").permitAll()
+
+                // 🔓 SWAGGER
+                .requestMatchers(
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui.html"
+                ).permitAll()
+
+                // 🔐 EVERYTHING ELSE
+                .anyRequest().authenticated()
+            );
+
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
