@@ -20,7 +20,6 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public List<Recommendation> getRecommendations(Long userId, LocalDate start, LocalDate end) {
-        // Ensure the repository has this method
         return recommendationRepository.findByUserIdAndDateBetween(userId, start, end);
     }
 
@@ -29,11 +28,15 @@ public class RecommendationServiceImpl implements RecommendationService {
         return recommendationRepository.findTopByUserIdOrderByGeneratedAtDesc(userId);
     }
 
-    public Recommendation createRecommendation(RecommendationRequest req) {
-        return Recommendation.builder()
+    @Override
+    public Recommendation generateRecommendation(long userId, RecommendationRequest req) {
+        Recommendation recommendation = Recommendation.builder()
+                .userId(userId)
                 .tags(req.getTags())
                 .difficulty(req.getDifficulty())
                 .contentType(req.getContentType())
+                .generatedAt(LocalDate.now())
                 .build();
+        return recommendationRepository.save(recommendation);
     }
 }

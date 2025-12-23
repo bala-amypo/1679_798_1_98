@@ -34,4 +34,16 @@ public class LessonServiceImpl implements LessonService {
         }
         return total;
     }
+
+    @Override
+    public MicroLesson addLesson(Long courseId, MicroLesson lesson) {
+        lesson.setCourseId(courseId); // assuming MicroLesson has setCourseId
+        return lessonRepository.save(lesson);
+    }
+
+    @Override
+    public List<MicroLesson> findLessonsByFilters(String tag, String difficulty, String contentType) {
+        // You need a repository method for filtering, or simple placeholder
+        return lessonRepository.findAll(); // placeholder, implement filtering in repo if needed
+    }
 }

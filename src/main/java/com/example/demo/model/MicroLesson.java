@@ -1,11 +1,13 @@
 package com.example.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MicroLesson {
 
     @Id
@@ -13,21 +15,12 @@ public class MicroLesson {
     private Long id;
 
     private String title;
-    private int durationMinutes; // important for LessonServiceImpl
+    private String contentType;
+    private String difficulty;
+    private String tag;
+    private int durationMinutes;
 
-    public int getDurationMinutes() {
-        return durationMinutes;
-    }
+    private Long courseId; // Add this
 
-    public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    // Lombok @Data generates getter/setter for courseId
 }
