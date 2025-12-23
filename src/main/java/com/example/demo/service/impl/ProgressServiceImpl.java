@@ -35,13 +35,14 @@ public class ProgressServiceImpl implements ProgressService {
         MicroLesson lesson = microLessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
 
-        if (progress.getProgressPercent() < 0 || progress.getProgressPercent() > 100) {
-            throw new IllegalArgumentException("Invalid progress percent");
+        int percent = progress.getProgressPercent() != null ? progress.getProgressPercent() : 0;
+        if (percent < 0 || percent > 100) {
+            throw new IllegalArgumentException("Progress percent must be between 0 and 100");
         }
 
-        if ("COMPLETED".equals(progress.getStatus()) &&
-                progress.getProgressPercent() != 100) {
-            throw new IllegalArgumentException("Completed must be 100%");
+        String status = progress.getStatus();
+        if ("COMPLETED".equalsIgnoreCase(status) && percent != 100) {
+            throw new IllegalArgumentException("COMPLETED status requires 100% progress");
         }
 
         Progress existing = progressRepository
@@ -54,8 +55,8 @@ public class ProgressServiceImpl implements ProgressService {
             return progressRepository.save(progress);
         }
 
-        existing.setStatus(progress.getStatus());
-        existing.setProgressPercent(progress.getProgressPercent());
+        existing.setStatus(status);
+        existing.setProgressPercent(percent);
         existing.setScore(progress.getScore());
 
         return progressRepository.save(existing);
@@ -64,7 +65,7 @@ public class ProgressServiceImpl implements ProgressService {
     @Override
     public Progress getProgress(Long userId, Long lessonId) {
         return progressRepository.findByUserIdAndMicroLessonId(userId, lessonId)
-                .orElseThrow(() -> new ResourceNotFoundException("Progress not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Progress not found for userId " + userId + " and lessonId " + lessonId));
     }
 
     @Override
