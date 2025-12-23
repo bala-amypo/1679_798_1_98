@@ -2,17 +2,10 @@ package com.example.demo.repository;
 
 import com.example.demo.model.Recommendation;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
-
-    List<Recommendation> findByUserIdAndGeneratedAtBetween(
-            Long userId,
-            LocalDateTime start,
-            LocalDateTime end
-    );
-
-    List<Recommendation> findByUserIdOrderByGeneratedAtDesc(Long userId);
+    List<Recommendation> findByUserIdAndDateBetween(Long userId, LocalDate start, LocalDate end);
+    Recommendation findTopByUserIdOrderByGeneratedAtDesc(Long userId);
 }

@@ -20,8 +20,13 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public List<Recommendation> getRecommendations(Long userId, LocalDate start, LocalDate end) {
-        // Example: fetch recommendations between dates
+        // Ensure the repository has this method
         return recommendationRepository.findByUserIdAndDateBetween(userId, start, end);
+    }
+
+    @Override
+    public Recommendation getLatestRecommendation(Long userId) {
+        return recommendationRepository.findTopByUserIdOrderByGeneratedAtDesc(userId);
     }
 
     public Recommendation createRecommendation(RecommendationRequest req) {

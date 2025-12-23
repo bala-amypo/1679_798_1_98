@@ -22,6 +22,11 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
+    public MicroLesson getLesson(Long id) {
+        return lessonRepository.findById(id).orElse(null);
+    }
+
+    @Override
     public int getTotalDuration() {
         int total = 0;
         for (MicroLesson lesson : lessonRepository.findAll()) {
