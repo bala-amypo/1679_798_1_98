@@ -1,5 +1,4 @@
 package com.example.demo.service.impl;
-
 import com.example.demo.dto.RecommendationRequest;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Recommendation;
@@ -8,7 +7,6 @@ import com.example.demo.repository.RecommendationRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.RecommendationService;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,9 +23,9 @@ public class RecommendationServiceImpl implements RecommendationService {
         this.userRepository = userRepository;
     }
 
-    // ✅ MUST MATCH INTERFACE EXACTLY
+    // ✅ MUST USE Long (NOT long)
     @Override
-    public Recommendation generateRecommendation(long userId,
+    public Recommendation generateRecommendation(Long userId,
                                                   RecommendationRequest request) {
 
         User user = userRepository.findById(userId)
@@ -44,8 +42,9 @@ public class RecommendationServiceImpl implements RecommendationService {
         return recommendationRepository.save(recommendation);
     }
 
+    // ✅ SIGNATURE FIXED
     @Override
-    public Recommendation getLatestRecommendation(long userId) {
+    public Recommendation getLatestRecommendation(Long userId) {
         return recommendationRepository
                 .findByUserIdOrderByGeneratedAtDesc(userId)
                 .stream()
@@ -54,8 +53,9 @@ public class RecommendationServiceImpl implements RecommendationService {
                         new ResourceNotFoundException("Recommendation not found"));
     }
 
+    // ✅ SIGNATURE FIXED
     @Override
-    public List<Recommendation> getRecommendations(long userId,
+    public List<Recommendation> getRecommendations(Long userId,
                                                    LocalDate from,
                                                    LocalDate to) {
 
