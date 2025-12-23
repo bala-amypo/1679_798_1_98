@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         if (user.getRole() == null) {
             user.setRole("LEARNER");
         }
@@ -39,7 +40,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    // ✅ FIX: signature must match interface
     @Override
     public AuthResponse login(AuthRequest request) {
         User user = findByEmail(request.getEmail());
@@ -48,16 +48,11 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Invalid credentials");
         }
 
-        // ✅ FIX: JwtUtil expects email (String)
         String token = jwtUtil.generateToken(user.getEmail());
 
-        // ✅ FIX: use setters (no multi-arg constructor)
+        // ✅ AuthResponse HAS ONLY token
         AuthResponse response = new AuthResponse();
         response.setToken(token);
-        response.setUserId(user.getId());
-        response.setEmail(user.getEmail());
-        response.setRole(user.getRole());
-        response.setMessage("Login successful");
 
         return response;
     }
@@ -74,5 +69,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
+    }
+
+    // ✅ REQUIRED BY INTERFACE
+    @Override
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
     }
 }

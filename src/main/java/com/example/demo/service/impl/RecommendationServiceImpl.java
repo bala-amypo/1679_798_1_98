@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.dto.RecommendationRequest;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Recommendation;
 import com.example.demo.model.User;
@@ -24,13 +25,15 @@ public class RecommendationServiceImpl implements RecommendationService {
         this.userRepository = userRepository;
     }
 
+    // ✅ MUST MATCH INTERFACE EXACTLY
     @Override
-    public Recommendation generateRecommendation(Long userId, Object params) {
+    public Recommendation generateRecommendation(long userId,
+                                                  RecommendationRequest request) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
 
-        // ✅ FIX: use .user(user), not userId
         Recommendation recommendation = Recommendation.builder()
                 .user(user)
                 .recommendedLessonIds("1,2,3")
@@ -42,8 +45,9 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     @Override
-    public Recommendation getLatestRecommendation(Long userId) {
-        return recommendationRepository.findByUserIdOrderByGeneratedAtDesc(userId)
+    public Recommendation getLatestRecommendation(long userId) {
+        return recommendationRepository
+                .findByUserIdOrderByGeneratedAtDesc(userId)
                 .stream()
                 .findFirst()
                 .orElseThrow(() ->
@@ -51,7 +55,10 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     @Override
-    public List<Recommendation> getRecommendations(Long userId, LocalDate from, LocalDate to) {
+    public List<Recommendation> getRecommendations(long userId,
+                                                   LocalDate from,
+                                                   LocalDate to) {
+
         LocalDateTime start = from.atStartOfDay();
         LocalDateTime end = to.atTime(23, 59, 59);
 
