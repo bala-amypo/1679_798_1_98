@@ -1,33 +1,41 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.dto.RecommendationRequest;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Recommendation;
+import com.example.demo.model.User;
 import com.example.demo.repository.RecommendationRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.RecommendationService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class RecommendationServiceImpl implements RecommendationService {
 
     private final RecommendationRepository recommendationRepository;
+    private final UserRepository userRepository;
 
-    public RecommendationServiceImpl(RecommendationRepository recommendationRepository) {
+    public RecommendationServiceImpl(RecommendationRepository recommendationRepository,
+                                     UserRepository userRepository) {
         this.recommendationRepository = recommendationRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public Recommendation generateRecommendation(long userId, RecommendationRequest req) {
-        String tags = req.getTags() != null ? String.join(",", req.getTags()) : "";
+    public Recommendation generateRecommendation(Long userId, Object params) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
 
+        // ✅ FIX: use .user(user), not userId
         Recommendation recommendation = Recommendation.builder()
-                .userId(userId)
-                .tags(tags)
-                .difficulty(req.getDifficulty())
-                .contentType(req.getContentType())
-                .generatedAt(LocalDate.now())
+                .user(user)
+                .recommendedLessonIds("1,2,3")
+                .confidenceScore(null)
+                .basisSnapshot(null)
                 .build();
 
         return recommendationRepository.save(recommendation);
@@ -35,13 +43,19 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public Recommendation getLatestRecommendation(Long userId) {
-        return recommendationRepository.findTopByUserIdOrderByGeneratedAtDesc(userId);
+        return recommendationRepository.findByUserIdOrderByGeneratedAtDesc(userId)
+                .stream()
+                .findFirst()
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Recommendation not found"));
     }
 
     @Override
-    public List<Recommendation> getRecommendations(Long userId, LocalDate start, LocalDate end) {
-        if (start == null) start = LocalDate.now().minusDays(30);
-        if (end == null) end = LocalDate.now();
-        return recommendationRepository.findByUserIdAndGeneratedAtBetween(userId, start, end);
+    public List<Recommendation> getRecommendations(Long userId, LocalDate from, LocalDate to) {
+        LocalDateTime start = from.atStartOfDay();
+        LocalDateTime end = to.atTime(23, 59, 59);
+
+        return recommendationRepository
+                .findByUserIdAndGeneratedAtBetween(userId, start, end);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.dto.AuthRequest;
 import com.example.demo.dto.AuthResponse;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.User;
@@ -38,17 +39,27 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    // ✅ FIX: signature must match interface
     @Override
-    public AuthResponse login(String email, String password) {
-        User user = findByEmail(email);
+    public AuthResponse login(AuthRequest request) {
+        User user = findByEmail(request.getEmail());
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid credentials");
         }
 
-        String token = jwtUtil.generateToken(user);
+        // ✅ FIX: JwtUtil expects email (String)
+        String token = jwtUtil.generateToken(user.getEmail());
 
-        return new AuthResponse(token, user.getId(), user.getEmail(), user.getRole(), "Login successful");
+        // ✅ FIX: use setters (no multi-arg constructor)
+        AuthResponse response = new AuthResponse();
+        response.setToken(token);
+        response.setUserId(user.getId());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole());
+        response.setMessage("Login successful");
+
+        return response;
     }
 
     @Override
