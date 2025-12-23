@@ -2,13 +2,14 @@ package com.example.demo.service;
 
 import com.example.demo.dto.RecommendationRequest;
 import com.example.demo.model.Recommendation;
-import java.time.LocalDate;
+
 import java.util.List;
 
 public interface RecommendationService {
-    List<Recommendation> getRecommendations(Long userId, LocalDate start, LocalDate end);
+
+    Recommendation generateRecommendation(long userId, RecommendationRequest request);
+
     Recommendation getLatestRecommendation(Long userId);
 
-    // Add this method
-    Recommendation generateRecommendation(long userId, RecommendationRequest req);
+    List<Recommendation> getRecommendationsForUser(Long userId);
 }
