@@ -25,6 +25,12 @@ public class UserServiceImpl implements UserService {
         this.jwtUtil = jwtUtil;
     }
 
+    // ✅ REQUIRED BY INTERFACE
+    @Override
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
     @Override
     public User register(User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
@@ -50,10 +56,8 @@ public class UserServiceImpl implements UserService {
 
         String token = jwtUtil.generateToken(user.getEmail());
 
-        // ✅ AuthResponse HAS ONLY token
         AuthResponse response = new AuthResponse();
         response.setToken(token);
-
         return response;
     }
 
@@ -71,7 +75,6 @@ public class UserServiceImpl implements UserService {
                         new ResourceNotFoundException("User not found"));
     }
 
-    // ✅ REQUIRED BY INTERFACE
     @Override
     public void deleteById(Long id) {
         userRepository.deleteById(id);
