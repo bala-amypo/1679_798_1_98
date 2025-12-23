@@ -28,13 +28,11 @@ public class LessonServiceImpl implements LessonService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Course not found with id: " + courseId));
 
-        if (lesson.getDurationMinutes() == null ||
-                lesson.getDurationMinutes() <= 0 ||
-                lesson.getDurationMinutes() > 15) {
+        // ✅ FIX: durationMinutes is primitive int → no null checks
+        if (lesson.getDurationMinutes() <= 0 || lesson.getDurationMinutes() > 15) {
             throw new IllegalArgumentException("Lesson duration must be between 1 and 15 minutes");
         }
 
-        // ✅ FIXED
         lesson.setCourse(course);
         return microLessonRepository.save(lesson);
     }
@@ -79,11 +77,10 @@ public class LessonServiceImpl implements LessonService {
         if (lesson.getDifficulty() != null) {
             existing.setDifficulty(lesson.getDifficulty());
         }
-        // ✅ FIXED
         if (lesson.getTags() != null) {
             existing.setTags(lesson.getTags());
         }
-        if (lesson.getDurationMinutes() != null && lesson.getDurationMinutes() > 0) {
+        if (lesson.getDurationMinutes() > 0) {
             existing.setDurationMinutes(lesson.getDurationMinutes());
         }
 
