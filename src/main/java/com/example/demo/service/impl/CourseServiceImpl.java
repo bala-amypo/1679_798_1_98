@@ -34,10 +34,6 @@ public class CourseServiceImpl implements CourseService {
             throw new IllegalArgumentException("User is not allowed to be an instructor");
         }
 
-        if (course.getTitle() == null || course.getTitle().isBlank()) {
-            throw new IllegalArgumentException("Course title is required");
-        }
-
         if (courseRepository.existsByTitleAndInstructorId(course.getTitle(), instructorId)) {
             throw new IllegalArgumentException("Course title already exists for this instructor");
         }
@@ -52,10 +48,7 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Course not found with id: " + courseId));
 
-        if (course.getTitle() != null && !course.getTitle().isBlank()) {
-            existing.setTitle(course.getTitle());
-        }
-
+        existing.setTitle(course.getTitle());
         existing.setDescription(course.getDescription());
         existing.setCategory(course.getCategory());
 
@@ -65,8 +58,8 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<Course> listCoursesByInstructor(Long instructorId) {
         return courseRepository.findAll().stream()
-                .filter(c -> c.getInstructor() != null
-                        && c.getInstructor().getId().equals(instructorId))
+                .filter(c -> c.getInstructor() != null &&
+                        c.getInstructor().getId().equals(instructorId))
                 .collect(Collectors.toList());
     }
 
