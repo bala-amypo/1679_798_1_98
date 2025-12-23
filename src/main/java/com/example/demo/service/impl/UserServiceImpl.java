@@ -7,7 +7,7 @@ import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder; // <-- use interface
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,11 +16,11 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder; // <-- interface type
     private final JwtUtil jwtUtil;
 
     public UserServiceImpl(UserRepository userRepository,
-                           BCryptPasswordEncoder passwordEncoder,
+                           PasswordEncoder passwordEncoder, // <-- interface type
                            JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -43,6 +43,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Email already exists");
         }
 
+        // Hash password using PasswordEncoder
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         if (user.getRole() == null) {
