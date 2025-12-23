@@ -26,7 +26,8 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Course createCourse(Course course, Long instructorId) {
         User instructor = userRepository.findById(instructorId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + instructorId));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: " + instructorId));
 
         if (!"INSTRUCTOR".equals(instructor.getRole()) &&
             !"ADMIN".equals(instructor.getRole())) {
@@ -48,7 +49,8 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Course updateCourse(Long courseId, Course course) {
         Course existing = courseRepository.findById(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + courseId));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Course not found with id: " + courseId));
 
         if (course.getTitle() != null && !course.getTitle().isBlank()) {
             existing.setTitle(course.getTitle());
@@ -63,13 +65,20 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<Course> listCoursesByInstructor(Long instructorId) {
         return courseRepository.findAll().stream()
-                .filter(c -> c.getInstructor() != null && c.getInstructor().getId().equals(instructorId))
+                .filter(c -> c.getInstructor() != null
+                        && c.getInstructor().getId().equals(instructorId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Course getCourse(Long courseId) {
         return courseRepository.findById(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + courseId));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Course not found with id: " + courseId));
+    }
+
+    @Override
+    public List<Course> getAllCourses() {
+        return courseRepository.findAll();
     }
 }
