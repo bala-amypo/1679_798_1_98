@@ -3,9 +3,19 @@ package com.example.demo.dto;
 import java.util.List;
 
 public class RecommendationRequest {
+
     private List<String> tags;
     private String difficulty;
     private String contentType;
+
+    public RecommendationRequest() {
+    }
+
+    public RecommendationRequest(List<String> tags, String difficulty, String contentType) {
+        this.tags = tags;
+        this.difficulty = difficulty;
+        this.contentType = contentType;
+    }
 
     public List<String> getTags() {
         return tags;
