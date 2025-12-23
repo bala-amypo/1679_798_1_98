@@ -1,5 +1,4 @@
 package com.example.demo.entity;
-
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -7,7 +6,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "recommendations")
 public class Recommendation {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -76,4 +74,8 @@ public class Recommendation {
     public void setConfidenceScore(BigDecimal confidenceScore) {
         this.confidenceScore = confidenceScore;
     }
+    @PrePersist
+    public void onGenerate() {
+    this.generatedAt = LocalDateTime.now();
+}
 }
