@@ -2,36 +2,54 @@ package com.example.demo.service.impl;
 
 import com.example.demo.model.Course;
 import com.example.demo.model.User;
-import com.example.demo.repository.CourseRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.service.CourseService;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
-public class CourseServiceImpl {
-    private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
+public class CourseServiceImpl implements CourseService {
 
-    public CourseServiceImpl(CourseRepository courseRepository, UserRepository userRepository) {
-        this.courseRepository = courseRepository;
-        this.userRepository = userRepository;
+    private List<Course> courses = new ArrayList<>();
+
+    @Override
+    public List<Course> getAllCourses() {
+        return courses;
     }
 
-    public Course createCourse(Course c, Long instructorId) {
-        User u = userRepository.findById(instructorId).orElseThrow(() -> new RuntimeException("No instructor"));
-        if (courseRepository.existsByTitleAndInstructorId(c.getTitle(), instructorId)) throw new RuntimeException("Duplicate");
-        c.setInstructor(u);
-        return courseRepository.save(c);
+    @Override
+    public List<Course> listCoursesByInstructor(Long instructorId) {
+        List<Course> result = new ArrayList<>();
+        for (Course c : courses) {
+            if (c.getInstructor() != null && c.getInstructor().getId().equals(instructorId)) {
+                result.add(c);
+            }
+        }
+        return result;
     }
 
+    @Override
+    public Course saveCourse(Course course) {
+        courses.add(course);
+        return course;
+    }
+
+    @Override
     public Course updateCourse(Long id, Course update) {
-        Course c = courseRepository.findById(id).orElseThrow();
-        if (update.getTitle() != null) c.setTitle(update.getTitle());
-        if (update.getDescription() != null) c.setDescription(update.getDescription());
-        return courseRepository.save(c);
+        for (Course c : courses) {
+            if (c.getId().equals(id)) {
+                c.setTitle(update.getTitle());
+                c.setDescription(update.getDescription());
+                c.setInstructor(update.getInstructor());
+                return c;
+            }
+        }
+        return null;
     }
 
-    public Course getCourse(Long id) {
-        return courseRepository.findById(id).orElseThrow();
+    @Override
+    public void deleteCourse(Long id) {
+        courses.removeIf(c -> c.getId().equals(id));
     }
 }

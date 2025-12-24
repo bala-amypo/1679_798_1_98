@@ -1,41 +1,48 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.Course;
 import com.example.demo.model.MicroLesson;
-import com.example.demo.repository.CourseRepository;
-import com.example.demo.repository.MicroLessonRepository;
+import com.example.demo.service.LessonService;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class LessonServiceImpl {
-    private final MicroLessonRepository lessonRepo;
-    private final CourseRepository courseRepo;
+public class LessonServiceImpl implements LessonService {
 
-    public LessonServiceImpl(MicroLessonRepository lessonRepo, CourseRepository courseRepo) {
-        this.lessonRepo = lessonRepo;
-        this.courseRepo = courseRepo;
+    private List<MicroLesson> lessons = new ArrayList<>();
+
+    @Override
+    public List<MicroLesson> getAllLessons() {
+        return lessons;
     }
 
-    public MicroLesson addLesson(Long courseId, MicroLesson lesson) {
-        Course c = courseRepo.findById(courseId).orElseThrow();
-        lesson.setCourse(c);
-        return lessonRepo.save(lesson);
+    @Override
+    public MicroLesson getLessonById(Long id) {
+        return lessons.stream().filter(l -> l.getId().equals(id)).findFirst().orElse(null);
     }
 
+    @Override
+    public MicroLesson saveLesson(MicroLesson lesson) {
+        lessons.add(lesson);
+        return lesson;
+    }
+
+    @Override
     public MicroLesson updateLesson(Long id, MicroLesson update) {
-        MicroLesson ml = lessonRepo.findById(id).orElseThrow();
-        if (update.getTitle() != null) ml.setTitle(update.getTitle());
-        if (update.getContentType() != null) ml.setContentType(update.getContentType());
-        if (update.getDifficulty() != null) ml.setDifficulty(update.getDifficulty());
-        return lessonRepo.save(ml);
+        for (MicroLesson lesson : lessons) {
+            if (lesson.getId().equals(id)) {
+                lesson.setTitle(update.getTitle());
+                lesson.setContentType(update.getContentType());
+                lesson.setDifficulty(update.getDifficulty());
+                return lesson;
+            }
+        }
+        return null;
     }
 
-    public MicroLesson getLesson(Long id) {
-        return lessonRepo.findById(id).orElseThrow();
-    }
-
-    public List<MicroLesson> findLessonsByFilters(String tags, String difficulty, String type) {
-        return lessonRepo.findByFilters(tags, difficulty, type);
+    @Override
+    public void deleteLesson(Long id) {
+        lessons.removeIf(l -> l.getId().equals(id));
     }
 }

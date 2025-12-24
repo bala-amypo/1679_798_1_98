@@ -1,24 +1,18 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.Recommendation;
-import com.example.demo.repository.RecommendationRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.model.Course;
+import com.example.demo.service.RecommendationService;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
-public class RecommendationServiceImpl {
-    private final RecommendationRepository repo;
-    private final UserRepository userRepo;
+public class RecommendationServiceImpl implements RecommendationService {
 
-    public RecommendationServiceImpl(RecommendationRepository repo, UserRepository userRepo) {
-        this.repo = repo;
-        this.userRepo = userRepo;
-    }
-
-    public Recommendation getLatestRecommendation(Long userId) {
-        List<Recommendation> list = repo.findByUserIdOrderByGeneratedAtDesc(userId);
-        if (list.isEmpty()) throw new RuntimeException("No recommendation");
-        return list.get(0);
+    @Override
+    public List<Course> getRecommendedCourses(Long userId) {
+        // Dummy implementation, return empty list
+        return new ArrayList<>();
     }
 }

@@ -1,39 +1,46 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.security.JwtUtil;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.example.demo.service.UserService;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
-public class UserServiceImpl {
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder encoder;
-    private final JwtUtil jwtUtil;
+public class UserServiceImpl implements UserService {
 
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder, JwtUtil jwtUtil) {
-        this.userRepository = userRepository;
-        this.encoder = encoder;
-        this.jwtUtil = jwtUtil;
+    private List<User> users = new ArrayList<>();
+
+    @Override
+    public List<User> findAll() {
+        return users;
     }
 
-    public User register(User user) {
-        if (user == null || userRepository.existsByEmail(user.getEmail())) throw new RuntimeException("Invalid");
-        user.setPassword(encoder.encode(user.getPassword()));
-        return userRepository.save(user);
+    @Override
+    public Optional<User> findById(Long id) {
+        return users.stream().filter(u -> u.getId().equals(id)).findFirst();
     }
 
-    public AuthResponse login(String email, String password) {
-        User u = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        if (!encoder.matches(password, u.getPassword())) throw new RuntimeException("Bad password");
-        String token = jwtUtil.generateToken(Collections.emptyMap(), email);
-        return AuthResponse.builder().accessToken(token).build();
+    @Override
+    public User save(User user) {
+        users.add(user);
+        return user;
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+    @Override
+    public User update(Long id, User user) {
+        Optional<User> existing = findById(id);
+        existing.ifPresent(e -> {
+            e.setEmail(user.getEmail());
+            e.setPassword(user.getPassword());
+        });
+        return existing.orElse(null);
+    }
+
+    @Override
+    public void delete(Long id) {
+        users.removeIf(u -> u.getId().equals(id));
     }
 }

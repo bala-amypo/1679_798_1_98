@@ -4,8 +4,9 @@ import com.example.demo.model.MicroLesson;
 import java.util.List;
 
 public interface LessonService {
-    MicroLesson addLesson(Long courseId, MicroLesson lesson);
-    MicroLesson updateLesson(Long lessonId, MicroLesson update);
-    MicroLesson getLesson(Long lessonId);
-    List<MicroLesson> findLessonsByFilters(String tags, String difficulty, String contentType);
+    List<MicroLesson> getAllLessons();
+    MicroLesson getLessonById(Long id);
+    MicroLesson saveLesson(MicroLesson lesson);
+    MicroLesson updateLesson(Long id, MicroLesson lesson);
+    void deleteLesson(Long id);
 }
