@@ -1,24 +1,31 @@
-package com.example.demo.model;
+package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
-@Builder
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Builder
 public class MicroLesson {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
-    private String contentType;
-    private String difficulty;
+
+    private String contentType; // VIDEO, TEXT
+
+    private String difficulty; // BEGINNER, INTERMEDIATE, ADVANCED
+
     private Integer durationMinutes;
-    private String tags;
+
+    private String tags; // csv: java,spring,jpa
 
     @ManyToOne
+    @JoinColumn(name = "course_id")
     private Course course;
 }

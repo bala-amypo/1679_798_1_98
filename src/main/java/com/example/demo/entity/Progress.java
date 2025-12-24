@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,30 +6,36 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Builder
 public class Progress {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "micro_lesson_id")
     private MicroLesson microLesson;
 
     private Integer progressPercent;
-    private String status;
+
+    private String status; // IN_PROGRESS, COMPLETED
+
     private BigDecimal score;
 
     private LocalDateTime lastAccessedAt;
 
     @PrePersist
     public void prePersist() {
-        lastAccessedAt = LocalDateTime.now();
+        this.lastAccessedAt = LocalDateTime.now();
     }
 }

@@ -1,38 +1,26 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.entity.Course;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.CourseRepository;
-import com.example.demo.service.CourseService;
+import com.example.demo.entity.User;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.service.UserService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class CourseServiceImpl implements CourseService {
+public class UserServiceImpl implements UserService {
 
-    private final CourseRepository courseRepository;
+    private final UserRepository repository;
 
-    public CourseServiceImpl(CourseRepository courseRepository) {
-        this.courseRepository = courseRepository;
+    public UserServiceImpl(UserRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public Course createCourse(Course course) {
-        return courseRepository.save(course);
+    public User register(User user) {
+        return repository.save(user);
     }
 
     @Override
-    public Course getCourseById(Long courseId) {
-        return courseRepository.findById(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
-    }
-
-    @Override
-    public List<Course> getCoursesByInstructor(Long instructorId) {
-        return courseRepository.findAll()
-                .stream()
-                .filter(c -> instructorId.equals(c.getInstructorId()))
-                .toList();
+    public User findById(Long id) {
+        return repository.findById(id).orElse(null);
     }
 }
