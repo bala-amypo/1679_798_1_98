@@ -23,12 +23,12 @@ public class Recommendation {
     private User user;
 
     @Column(length = 2000)
-    private String recommendedLessonIds; // csv: 1,2,3
+    private String recommendedLessonIds;
 
-    @Column(length = 2000)
-    private String basisSnapshot; // json string
+    @Column(length = 1000)
+    private String reason;
 
-    private BigDecimal confidenceScore; // 0.0 – 1.0
+    private BigDecimal confidenceScore;
 
     private LocalDateTime generatedAt;
 
