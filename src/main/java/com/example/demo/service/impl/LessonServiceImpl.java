@@ -1,35 +1,28 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.entity.Course;
 import com.example.demo.entity.MicroLesson;
-import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.repository.CourseRepository;
 import com.example.demo.repository.MicroLessonRepository;
 import com.example.demo.service.LessonService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class LessonServiceImpl implements LessonService {
 
-    private final MicroLessonRepository microLessonRepository;
+    private final CourseRepository courseRepository;
+    private final MicroLessonRepository lessonRepository;
 
-    public LessonServiceImpl(MicroLessonRepository microLessonRepository) {
-        this.microLessonRepository = microLessonRepository;
+    public LessonServiceImpl(CourseRepository courseRepository,
+                             MicroLessonRepository lessonRepository) {
+        this.courseRepository = courseRepository;
+        this.lessonRepository = lessonRepository;
     }
 
     @Override
-    public MicroLesson createLesson(MicroLesson lesson) {
-        return microLessonRepository.save(lesson);
-    }
-
-    @Override
-    public MicroLesson getLessonById(Long lessonId) {
-        return microLessonRepository.findById(lessonId)
-                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
-    }
-
-    @Override
-    public List<MicroLesson> searchLessons(String tag, String difficulty, String contentType) {
-        return microLessonRepository.findByFilters(tag, difficulty, contentType);
+    public MicroLesson addLesson(Long courseId, MicroLesson lesson) {
+        Course course = courseRepository.findById(courseId).orElse(null);
+        lesson.setCourse(course);
+        return lessonRepository.save(lesson);
     }
 }
