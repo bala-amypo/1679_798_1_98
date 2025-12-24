@@ -1,39 +1,38 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
-import com.example.demo.security.JwtUtil;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.example.demo.entity.Course;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.repository.CourseRepository;
+import com.example.demo.service.CourseService;
+import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.List;
 
-public class UserServiceImpl {
+@Service
+public class CourseServiceImpl implements CourseService {
 
-    private final UserRepository repo;
-    private final BCryptPasswordEncoder encoder;
-    private final JwtUtil jwt;
+    private final CourseRepository courseRepository;
 
-    public UserServiceImpl(UserRepository repo, BCryptPasswordEncoder encoder, JwtUtil jwt) {
-        this.repo = repo;
-        this.encoder = encoder;
-        this.jwt = jwt;
+    public CourseServiceImpl(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
     }
 
-    public User register(User u) {
-        if (u == null) throw new RuntimeException();
-        if (repo.existsByEmail(u.getEmail())) throw new RuntimeException();
-        u.setPassword(encoder.encode(u.getPassword()));
-        return repo.save(u);
+    @Override
+    public Course createCourse(Course course) {
+        return courseRepository.save(course);
     }
 
-    public AuthResponse login(String email, String rawPassword) {
-        User u = repo.findByEmail(email).orElseThrow();
-        if (!encoder.matches(rawPassword, u.getPassword())) throw new RuntimeException();
-        return new AuthResponse(jwt.generateToken(new HashMap<>(), email));
+    @Override
+    public Course getCourseById(Long courseId) {
+        return courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
     }
 
-    public User findByEmail(String email) {
-        return repo.findByEmail(email).orElse(null);
+    @Override
+    public List<Course> getCoursesByInstructor(Long instructorId) {
+        return courseRepository.findAll()
+                .stream()
+                .filter(c -> instructorId.equals(c.getInstructorId()))
+                .toList();
     }
 }

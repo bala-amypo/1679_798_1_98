@@ -1,37 +1,45 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.*;
-import com.example.demo.repository.*;
+import com.example.demo.entity.Progress;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.repository.ProgressRepository;
+import com.example.demo.service.ProgressService;
+import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-public class ProgressServiceImpl {
+@Service
+public class ProgressServiceImpl implements ProgressService {
 
-    private final ProgressRepository repo;
-    private final UserRepository userRepo;
-    private final MicroLessonRepository lessonRepo;
+    private final ProgressRepository progressRepository;
 
-    public ProgressServiceImpl(ProgressRepository repo, UserRepository userRepo, MicroLessonRepository lessonRepo) {
-        this.repo = repo;
-        this.userRepo = userRepo;
-        this.lessonRepo = lessonRepo;
+    public ProgressServiceImpl(ProgressRepository progressRepository) {
+        this.progressRepository = progressRepository;
     }
 
-    public Progress recordProgress(Long userId, Long lessonId, Progress incoming) {
-        User u = userRepo.findById(userId).orElseThrow();
-        MicroLesson ml = lessonRepo.findById(lessonId).orElseThrow();
+    @Override
+    public Progress markProgress(Long userId, Long lessonId, boolean completed) {
+        Progress progress = progressRepository
+                .findByUserIdAndMicroLessonId(userId, lessonId)
+                .orElse(new Progress());
 
-        Progress p = repo.findByUserIdAndMicroLessonId(userId, lessonId)
-                .orElse(Progress.builder().user(u).microLesson(ml).build());
+        progress.setUserId(userId);
+        progress.setMicroLessonId(lessonId);
+        progress.setCompleted(completed);
+        progress.setLastAccessedAt(LocalDateTime.now());
 
-        p.setProgressPercent(incoming.getProgressPercent());
-        p.setStatus(incoming.getStatus());
-        p.setScore(incoming.getScore());
-
-        return repo.save(p);
+        return progressRepository.save(progress);
     }
 
-    public List<Progress> getUserProgress(Long userId) {
-        return repo.findByUserIdOrderByLastAccessedAtDesc(userId);
+    @Override
+    public Progress getProgress(Long userId, Long lessonId) {
+        return progressRepository.findByUserIdAndMicroLessonId(userId, lessonId)
+                .orElseThrow(() -> new ResourceNotFoundException("Progress not found"));
+    }
+
+    @Override
+    public List<Progress> getRecentProgress(Long userId) {
+        return progressRepository.findByUserIdOrderByLastAccessedAtDesc(userId);
     }
 }

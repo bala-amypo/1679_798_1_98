@@ -1,41 +1,35 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.Course;
-import com.example.demo.model.MicroLesson;
-import com.example.demo.repository.CourseRepository;
+import com.example.demo.entity.MicroLesson;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.MicroLessonRepository;
+import com.example.demo.service.LessonService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public class LessonServiceImpl {
+@Service
+public class LessonServiceImpl implements LessonService {
 
-    private final MicroLessonRepository repo;
-    private final CourseRepository courseRepo;
+    private final MicroLessonRepository microLessonRepository;
 
-    public LessonServiceImpl(MicroLessonRepository repo, CourseRepository courseRepo) {
-        this.repo = repo;
-        this.courseRepo = courseRepo;
+    public LessonServiceImpl(MicroLessonRepository microLessonRepository) {
+        this.microLessonRepository = microLessonRepository;
     }
 
-    public MicroLesson addLesson(Long courseId, MicroLesson m) {
-        Course c = courseRepo.findById(courseId).orElseThrow();
-        m.setCourse(c);
-        return repo.save(m);
+    @Override
+    public MicroLesson createLesson(MicroLesson lesson) {
+        return microLessonRepository.save(lesson);
     }
 
-    public MicroLesson updateLesson(Long id, MicroLesson upd) {
-        MicroLesson m = repo.findById(id).orElseThrow();
-        m.setTitle(upd.getTitle());
-        m.setContentType(upd.getContentType());
-        m.setDifficulty(upd.getDifficulty());
-        return repo.save(m);
+    @Override
+    public MicroLesson getLessonById(Long lessonId) {
+        return microLessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
     }
 
-    public MicroLesson getLesson(Long id) {
-        return repo.findById(id).orElseThrow();
-    }
-
-    public List<MicroLesson> findLessonsByFilters(String t, String d, String c) {
-        return repo.findByFilters(t, d, c);
+    @Override
+    public List<MicroLesson> searchLessons(String tag, String difficulty, String contentType) {
+        return microLessonRepository.findByFilters(tag, difficulty, contentType);
     }
 }
