@@ -1,89 +1,41 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Course;
 import com.example.demo.model.MicroLesson;
 import com.example.demo.repository.CourseRepository;
 import com.example.demo.repository.MicroLessonRepository;
-import com.example.demo.service.LessonService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
-public class LessonServiceImpl implements LessonService {
+public class LessonServiceImpl {
+    private final MicroLessonRepository lessonRepo;
+    private final CourseRepository courseRepo;
 
-    private final MicroLessonRepository microLessonRepository;
-    private final CourseRepository courseRepository;
-
-    public LessonServiceImpl(MicroLessonRepository microLessonRepository,
-                             CourseRepository courseRepository) {
-        this.microLessonRepository = microLessonRepository;
-        this.courseRepository = courseRepository;
+    public LessonServiceImpl(MicroLessonRepository lessonRepo, CourseRepository courseRepo) {
+        this.lessonRepo = lessonRepo;
+        this.courseRepo = courseRepo;
     }
 
-    @Override
     public MicroLesson addLesson(Long courseId, MicroLesson lesson) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Course not found with id: " + courseId));
-
-        // ✅ FIX: durationMinutes is primitive int → no null checks
-        if (lesson.getDurationMinutes() <= 0 || lesson.getDurationMinutes() > 15) {
-            throw new IllegalArgumentException("Lesson duration must be between 1 and 15 minutes");
-        }
-
-        lesson.setCourse(course);
-        return microLessonRepository.save(lesson);
+        Course c = courseRepo.findById(courseId).orElseThrow();
+        lesson.setCourse(c);
+        return lessonRepo.save(lesson);
     }
 
-    @Override
-    public List<MicroLesson> findLessonsByFilters(String tags, String difficulty, String contentType) {
-        return microLessonRepository.findByFilters(tags, difficulty, contentType);
+    public MicroLesson updateLesson(Long id, MicroLesson update) {
+        MicroLesson ml = lessonRepo.findById(id).orElseThrow();
+        if (update.getTitle() != null) ml.setTitle(update.getTitle());
+        if (update.getContentType() != null) ml.setContentType(update.getContentType());
+        if (update.getDifficulty() != null) ml.setDifficulty(update.getDifficulty());
+        return lessonRepo.save(ml);
     }
 
-    @Override
-    public MicroLesson getLesson(Long lessonId) {
-        return microLessonRepository.findById(lessonId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Lesson not found with id: " + lessonId));
+    public MicroLesson getLesson(Long id) {
+        return lessonRepo.findById(id).orElseThrow();
     }
 
-    @Override
-    public List<MicroLesson> getAllLessons() {
-        return microLessonRepository.findAll();
-    }
-
-    @Override
-    public int getTotalDuration() {
-        return microLessonRepository.findAll()
-                .stream()
-                .mapToInt(MicroLesson::getDurationMinutes)
-                .sum();
-    }
-
-    @Override
-    public MicroLesson updateLesson(Long lessonId, MicroLesson lesson) {
-        MicroLesson existing = microLessonRepository.findById(lessonId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Lesson not found with id: " + lessonId));
-
-        if (lesson.getTitle() != null) {
-            existing.setTitle(lesson.getTitle());
-        }
-        if (lesson.getContentType() != null) {
-            existing.setContentType(lesson.getContentType());
-        }
-        if (lesson.getDifficulty() != null) {
-            existing.setDifficulty(lesson.getDifficulty());
-        }
-        if (lesson.getTags() != null) {
-            existing.setTags(lesson.getTags());
-        }
-        if (lesson.getDurationMinutes() > 0) {
-            existing.setDurationMinutes(lesson.getDurationMinutes());
-        }
-
-        return microLessonRepository.save(existing);
+    public List<MicroLesson> findLessonsByFilters(String tags, String difficulty, String type) {
+        return lessonRepo.findByFilters(tags, difficulty, type);
     }
 }
