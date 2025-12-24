@@ -1,40 +1,37 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.Progress;
-import com.example.demo.service.ProgressService;
-import org.springframework.stereotype.Service;
+import com.example.demo.model.*;
+import com.example.demo.repository.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Service
-public class ProgressServiceImpl implements ProgressService {
+public class ProgressServiceImpl {
 
-    private List<Progress> progresses = new ArrayList<>();
+    private final ProgressRepository repo;
+    private final UserRepository userRepo;
+    private final MicroLessonRepository lessonRepo;
 
-    @Override
-    public Progress getProgress(Long userId, Long lessonId) {
-        return progresses.stream()
-                .filter(p -> p.getUser().getId().equals(userId) && p.getMicroLesson().getId().equals(lessonId))
-                .findFirst().orElse(null);
+    public ProgressServiceImpl(ProgressRepository repo, UserRepository userRepo, MicroLessonRepository lessonRepo) {
+        this.repo = repo;
+        this.userRepo = userRepo;
+        this.lessonRepo = lessonRepo;
     }
 
-    @Override
-    public Progress saveProgress(Progress progress) {
-        progresses.add(progress);
-        return progress;
+    public Progress recordProgress(Long userId, Long lessonId, Progress incoming) {
+        User u = userRepo.findById(userId).orElseThrow();
+        MicroLesson ml = lessonRepo.findById(lessonId).orElseThrow();
+
+        Progress p = repo.findByUserIdAndMicroLessonId(userId, lessonId)
+                .orElse(Progress.builder().user(u).microLesson(ml).build());
+
+        p.setProgressPercent(incoming.getProgressPercent());
+        p.setStatus(incoming.getStatus());
+        p.setScore(incoming.getScore());
+
+        return repo.save(p);
     }
 
-    @Override
-    public Progress updateProgress(Long id, Progress incoming) {
-        for (Progress p : progresses) {
-            if (p.getId().equals(id)) {
-                p.setScore(incoming.getScore());
-                p.setStatus(incoming.getStatus());
-                p.setProgressPercent(incoming.getProgressPercent());
-                return p;
-            }
-        }
-        return null;
+    public List<Progress> getUserProgress(Long userId) {
+        return repo.findByUserIdOrderByLastAccessedAtDesc(userId);
     }
 }

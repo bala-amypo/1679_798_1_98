@@ -4,40 +4,34 @@ import com.example.demo.model.Course;
 import com.example.demo.model.User;
 import com.example.demo.repository.CourseRepository;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.service.CourseService;
-import org.springframework.stereotype.Service;
-import java.util.List;
 
-@Service
-public class CourseServiceImpl implements CourseService {
+public class CourseServiceImpl {
 
-    private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
+    private final CourseRepository repo;
+    private final UserRepository userRepo;
 
-    public CourseServiceImpl(CourseRepository courseRepository, UserRepository userRepository) {
-        this.courseRepository = courseRepository;
-        this.userRepository = userRepository;
+    public CourseServiceImpl(CourseRepository repo, UserRepository userRepo) {
+        this.repo = repo;
+        this.userRepo = userRepo;
     }
 
-    @Override
-    public Course createCourse(Course course, Long instructorId) {
-        User instructor = userRepository.findById(instructorId).orElseThrow();
-        course.setInstructor(instructor);
-        return courseRepository.save(course);
+    public Course createCourse(Course c, Long instructorId) {
+        User u = userRepo.findById(instructorId).orElseThrow();
+        if (repo.existsByTitleAndInstructorId(c.getTitle(), instructorId)) {
+            throw new RuntimeException();
+        }
+        c.setInstructor(u);
+        return repo.save(c);
     }
 
-    @Override
-    public Course getCourse(Long courseId) {
-        return courseRepository.findById(courseId).orElseThrow();
+    public Course updateCourse(Long id, Course update) {
+        Course c = repo.findById(id).orElseThrow();
+        c.setTitle(update.getTitle());
+        c.setDescription(update.getDescription());
+        return repo.save(c);
     }
 
-    @Override
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
-    }
-
-    @Override
-    public List<Course> listCoursesByInstructor(Long instructorId) {
-        return courseRepository.findByInstructorId(instructorId);
+    public Course getCourse(Long id) {
+        return repo.findById(id).orElseThrow();
     }
 }

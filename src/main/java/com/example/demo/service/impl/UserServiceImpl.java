@@ -1,46 +1,39 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.dto.AuthResponse;
 import com.example.demo.model.User;
-import com.example.demo.service.UserService;
-import org.springframework.stereotype.Service;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.security.JwtUtil;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.HashMap;
 
-@Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl {
 
-    private List<User> users = new ArrayList<>();
+    private final UserRepository repo;
+    private final BCryptPasswordEncoder encoder;
+    private final JwtUtil jwt;
 
-    @Override
-    public List<User> findAll() {
-        return users;
+    public UserServiceImpl(UserRepository repo, BCryptPasswordEncoder encoder, JwtUtil jwt) {
+        this.repo = repo;
+        this.encoder = encoder;
+        this.jwt = jwt;
     }
 
-    @Override
-    public Optional<User> findById(Long id) {
-        return users.stream().filter(u -> u.getId().equals(id)).findFirst();
+    public User register(User u) {
+        if (u == null) throw new RuntimeException();
+        if (repo.existsByEmail(u.getEmail())) throw new RuntimeException();
+        u.setPassword(encoder.encode(u.getPassword()));
+        return repo.save(u);
     }
 
-    @Override
-    public User save(User user) {
-        users.add(user);
-        return user;
+    public AuthResponse login(String email, String rawPassword) {
+        User u = repo.findByEmail(email).orElseThrow();
+        if (!encoder.matches(rawPassword, u.getPassword())) throw new RuntimeException();
+        return new AuthResponse(jwt.generateToken(new HashMap<>(), email));
     }
 
-    @Override
-    public User update(Long id, User user) {
-        Optional<User> existing = findById(id);
-        existing.ifPresent(e -> {
-            e.setEmail(user.getEmail());
-            e.setPassword(user.getPassword());
-        });
-        return existing.orElse(null);
-    }
-
-    @Override
-    public void delete(Long id) {
-        users.removeIf(u -> u.getId().equals(id));
+    public User findByEmail(String email) {
+        return repo.findByEmail(email).orElse(null);
     }
 }

@@ -3,17 +3,19 @@ package com.example.demo.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class MicroLesson {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id @GeneratedValue
     private Long id;
+
     private String title;
-    private String difficulty;
     private String contentType;
+    private String difficulty;
     private Integer durationMinutes;
     private String tags;
 

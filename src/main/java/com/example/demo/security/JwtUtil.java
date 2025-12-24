@@ -1,15 +1,14 @@
 package com.example.demo.security;
 
-import org.springframework.stereotype.Component;
 import java.util.Map;
 
-@Component
 public class JwtUtil {
+
     public String generateToken(Map<String, Object> claims, String subject) {
-        return "dummy-jwt-token";
+        return "dummy";
     }
 
     public boolean validateToken(String token) {
-        return !token.equals("bad") && !token.equals("expired");
+        return false;
     }
 }
