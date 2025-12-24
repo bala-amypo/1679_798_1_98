@@ -23,9 +23,18 @@ public class JwtUtil {
     @Value("${jwt.expiration:3600000}") // default 1 hour
     private long jwtExpirationInMs;
 
-    // Generate token for username
+    // -------------------------
+    // Generate token for username (no custom claims)
+    // -------------------------
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, username);
+    }
+
+    // -------------------------
+    // Generate token with custom claims
+    // -------------------------
+    public String generateToken(Map<String, Object> claims, String username) {
         return createToken(claims, username);
     }
 
