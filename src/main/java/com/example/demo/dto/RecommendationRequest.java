@@ -1,11 +1,8 @@
 package com.example.demo.dto;
 
-import lombok.*;
+import lombok.Data;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class RecommendationRequest {
     private Long userId;
 }
