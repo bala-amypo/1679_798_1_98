@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import com.example.demo.service.UserService;
-import com.example.demo.entity.User;
+import com.example.demo.model.User;
 import com.example.demo.dto.AuthResponse;
 
 @RestController
