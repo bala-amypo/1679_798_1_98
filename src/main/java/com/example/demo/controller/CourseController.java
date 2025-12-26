@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-import com.example.demo.model.Course;
+import com.example.demo.entity.Course;
 import com.example.demo.service.CourseService;
 
 @RestController

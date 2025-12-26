@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-import com.example.demo.model.Lesson;
+import com.example.demo.entity.Lesson;
 import com.example.demo.service.LessonService;
 
 @RestController
