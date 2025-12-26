@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class User {
     private String email;
     
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     
     @Column(nullable = false)
@@ -37,6 +39,7 @@ public class User {
     private String preferredLearningStyle;
     
     @Column(name = "created_at")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime createdAt;
     
     @PrePersist
@@ -47,9 +50,14 @@ public class User {
         }
     }
     
-    // Allow password to be set from JSON but not returned
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    public String getPassword() {
-        return password;
+    // This prevents id from being accepted in request body
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public Long getId() {
+        return id;
+    }
+    
+    // This allows id to be set internally (by Hibernate)
+    public void setId(Long id) {
+        this.id = id;
     }
 }
