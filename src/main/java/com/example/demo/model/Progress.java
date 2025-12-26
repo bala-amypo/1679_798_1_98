@@ -1,41 +1,28 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Progress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    private int percentage;
 
+    // Link to MicroLesson
     @ManyToOne
-    @JoinColumn(name = "micro_lesson_id")
+    @JoinColumn(name = "micro_lesson_id") // Foreign key column in DB
     private MicroLesson microLesson;
 
-    private Integer progressPercent;
+    // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    private String status; // IN_PROGRESS, COMPLETED
+    public int getPercentage() { return percentage; }
+    public void setPercentage(int percentage) { this.percentage = percentage; }
 
-    private BigDecimal score;
-
-    private LocalDateTime lastAccessedAt;
-
-    @PrePersist
-    public void prePersist() {
-        this.lastAccessedAt = LocalDateTime.now();
-    }
+    public MicroLesson getMicroLesson() { return microLesson; }
+    public void setMicroLesson(MicroLesson microLesson) { this.microLesson = microLesson; }
 }

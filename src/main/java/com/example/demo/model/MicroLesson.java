@@ -1,14 +1,9 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import java.util.List;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class MicroLesson {
 
     @Id
@@ -17,10 +12,17 @@ public class MicroLesson {
 
     private String title;
 
-    @Column(length = 5000)
-    private String content;
+    // Optional: bidirectional relationship
+    @OneToMany(mappedBy = "microLesson")
+    private List<Progress> progresses;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;
+    // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public List<Progress> getProgresses() { return progresses; }
+    public void setProgresses(List<Progress> progresses) { this.progresses = progresses; }
 }
