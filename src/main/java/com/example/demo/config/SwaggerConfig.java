@@ -17,7 +17,7 @@ public class SwaggerConfig {
                         new Server().url("https://9204.pro604cr.amypo.ai/")
                 ))
                 .components(new Components()
-                        .addSecuritySchemes("bearerAuth",  // 👈 This adds the Authorize button
+                        .addSecuritySchemes("bearerAuth", 
                                 new SecurityScheme()
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
