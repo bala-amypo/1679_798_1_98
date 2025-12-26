@@ -1,6 +1,5 @@
 package com.example.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,12 +26,14 @@ public class User {
     @Column(unique = true)
     private String email;
     
-    @JsonIgnore // Prevents password from being returned in responses
+    @Column(nullable = false)
     private String password;
     
-    private String role;
+    @Column(nullable = false)
+    @Builder.Default
+    private String role = "LEARNER";
     
-    @Column(name = "preferred_learning_style")
+    @Column(name = "preferred_learning_style", length = 50)
     private String preferredLearningStyle;
     
     @Column(name = "created_at")
@@ -46,9 +47,9 @@ public class User {
         }
     }
     
-    // Add @JsonProperty to allow setting password from request
+    // Allow password to be set from JSON but not returned
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    public void setPassword(String password) {
-        this.password = password;
+    public String getPassword() {
+        return password;
     }
 }

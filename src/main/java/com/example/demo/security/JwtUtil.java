@@ -2,28 +2,31 @@ package com.example.demo.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import javax.crypto.SecretKey;
+import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 
 @Component
 public class JwtUtil {
     
-    private SecretKey secretKey;
+    @Value("${jwt.secret:Amypo1234567890Amypo1234567890Amypo1234567890}")
+    private String secret;
+    
+    @Value("${jwt.expiration-ms:86400000}")
     private long expirationMs;
     
-    // Constructor that handles missing properties gracefully
-    public JwtUtil(@Value("${jwt.secret:#{null}}") String secret,
-                   @Value("${jwt.expiration-ms:#{null}}") Long expirationMs) {
-        
-        // Handle missing secret with fallback
+    private Key key;
+    
+    @PostConstruct
+    public void init() {
+        // Ensure secret is at least 32 characters
         if (secret == null || secret.trim().isEmpty()) {
-            secret = "Amypo1234567890Amypo1234567890Amypo1234567890"; // Using your password as base
+            secret = "Amypo1234567890Amypo1234567890Amypo1234567890";
         }
         
-        // Ensure secret is at least 32 characters
         if (secret.length() < 32) {
             // Pad with characters to reach 32
             StringBuilder sb = new StringBuilder(secret);
@@ -32,12 +35,10 @@ public class JwtUtil {
             }
             secret = sb.toString();
         } else if (secret.length() > 64) {
-            // Trim if too long
             secret = secret.substring(0, 64);
         }
         
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
-        this.expirationMs = expirationMs != null ? expirationMs : 86400000L; // Default 24 hours
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
     
     public String generateToken(Map<String, Object> claims, String subject) {
@@ -46,14 +47,14 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
     
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);
             return true;
@@ -62,10 +63,9 @@ public class JwtUtil {
         }
     }
     
-    // Helper methods that might be used in tests
     public Claims extractClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

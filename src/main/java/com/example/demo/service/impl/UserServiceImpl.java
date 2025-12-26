@@ -27,13 +27,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public User register(User user) {
         try {
-            log.info("Registering user with email: {}", user.getEmail());
+            log.info("=== USER REGISTRATION START ===");
+            log.info("Received user data - Email: {}, Name: {}, Role: {}", 
+                     user.getEmail(), user.getFullName(), user.getRole());
             
+            // Check if email already exists
             if (userRepository.existsByEmail(user.getEmail())) {
+                log.error("Registration failed: Email already exists - {}", user.getEmail());
                 throw new RuntimeException("Email already exists");
             }
             
-            // Basic validation
+            // Validate required fields
             if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
                 throw new RuntimeException("Email is required");
             }
@@ -46,20 +50,47 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException("Full name is required");
             }
             
-            // Encode password
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            // Important: Reset ID to null to avoid ID conflicts
+            user.setId(null);
+            
+            // Hash the password
+            String rawPassword = user.getPassword();
+            String encodedPassword = passwordEncoder.encode(rawPassword);
+            user.setPassword(encodedPassword);
             
             // Set default role if not provided
             if (user.getRole() == null || user.getRole().trim().isEmpty()) {
                 user.setRole("LEARNER");
+                log.info("Setting default role: LEARNER");
             }
             
+            // Ensure createdAt is null (will be set by @PrePersist)
+            user.setCreatedAt(null);
+            
+            // Save user to database
+            log.info("Saving user to database...");
             User savedUser = userRepository.save(user);
-            log.info("User registered successfully: {}", savedUser.getEmail());
+            
+            log.info("=== USER REGISTRATION SUCCESS ===");
+            log.info("User registered successfully - ID: {}, Email: {}, Role: {}", 
+                     savedUser.getId(), savedUser.getEmail(), savedUser.getRole());
+            
             return savedUser;
             
         } catch (Exception e) {
-            log.error("Error registering user: {}", e.getMessage(), e);
+            log.error("=== USER REGISTRATION FAILED ===");
+            log.error("Error details: {}", e.getMessage());
+            log.error("Stack trace:", e);
+            
+            // Check for common database errors
+            if (e.getMessage().contains("Duplicate entry")) {
+                throw new RuntimeException("Email already registered");
+            } else if (e.getMessage().contains("Data truncation")) {
+                throw new RuntimeException("Input data too long for field");
+            } else if (e.getMessage().contains("cannot be null")) {
+                throw new RuntimeException("Required field is missing");
+            }
+            
             throw new RuntimeException("Registration failed: " + e.getMessage());
         }
     }
@@ -67,46 +98,92 @@ public class UserServiceImpl implements UserService {
     @Override
     public AuthResponse login(String email, String password) {
         try {
+            log.info("=== USER LOGIN ATTEMPT ===");
             log.info("Login attempt for email: {}", email);
             
+            // Find user by email
             User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> {
+                    log.error("Login failed: User not found with email {}", email);
+                    return new RuntimeException("Invalid email or password");
+                });
             
-            if (!passwordEncoder.matches(password, user.getPassword())) {
-                throw new RuntimeException("Invalid credentials");
+            log.info("User found - ID: {}, Role: {}", user.getId(), user.getRole());
+            
+            // Verify password
+            boolean passwordMatches = passwordEncoder.matches(password, user.getPassword());
+            if (!passwordMatches) {
+                log.error("Login failed: Password incorrect for user {}", email);
+                throw new RuntimeException("Invalid email or password");
             }
             
+            // Generate JWT token
             Map<String, Object> claims = new HashMap<>();
             claims.put("userId", user.getId());
             claims.put("role", user.getRole());
             
             String token = jwtUtil.generateToken(claims, user.getEmail());
+            log.info("JWT token generated successfully for user: {}", email);
             
-            log.info("Login successful for user: {}", email);
-            
-            return AuthResponse.builder()
+            // Build response
+            AuthResponse response = AuthResponse.builder()
                     .accessToken(token)
                     .userId(user.getId())
                     .email(user.getEmail())
                     .role(user.getRole())
                     .message("Login successful")
                     .build();
+            
+            log.info("=== USER LOGIN SUCCESS ===");
+            log.info("User logged in successfully - ID: {}, Email: {}", user.getId(), email);
+            
+            return response;
                     
         } catch (Exception e) {
-            log.error("Login failed for email {}: {}", email, e.getMessage());
+            log.error("=== USER LOGIN FAILED ===");
+            log.error("Login error for email {}: {}", email, e.getMessage());
             throw new RuntimeException("Login failed: " + e.getMessage());
         }
     }
     
     @Override
     public User findById(Long id) {
-        return userRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        try {
+            log.info("Finding user by ID: {}", id);
+            return userRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {}", id);
+                    return new ResourceNotFoundException("User not found");
+                });
+        } catch (Exception e) {
+            log.error("Error finding user by ID {}: {}", id, e.getMessage());
+            throw e;
+        }
     }
     
     @Override
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        try {
+            log.info("Finding user by email: {}", email);
+            return userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.error("User not found with email: {}", email);
+                    return new ResourceNotFoundException("User not found");
+                });
+        } catch (Exception e) {
+            log.error("Error finding user by email {}: {}", email, e.getMessage());
+            throw e;
+        }
+    }
+    
+    // Optional: Helper method to check if email exists
+    public boolean emailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+    
+    // Optional: Helper method to get all users (for debugging)
+    public java.util.List<User> getAllUsers() {
+        log.info("Retrieving all users");
+        return userRepository.findAll();
     }
 }
