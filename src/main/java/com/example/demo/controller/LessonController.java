@@ -1,17 +1,56 @@
-@PostMapping("/course/{courseId}")
-public ResponseEntity<MicroLesson> addLesson(
-        @PathVariable Long courseId,
-        @RequestBody RecommendationRequest request) {
+package com.example.demo.controller;
 
-    MicroLesson created = lessonService.addLesson(courseId, request);
-    return ResponseEntity.ok(created);
-}
+import com.example.demo.dto.RecommendationRequest;
+import com.example.demo.model.MicroLesson;
+import com.example.demo.service.LessonService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+@RestController
+@RequestMapping("/lessons")
+@Tag(name = "Lesson Management")
+@RequiredArgsConstructor
+public class LessonController {
 
-@PutMapping("/{lessonId}")
-public ResponseEntity<MicroLesson> updateLesson(
-        @PathVariable Long lessonId,
-        @RequestBody RecommendationRequest request) {
+    private final LessonService lessonService;
 
-    MicroLesson updated = lessonService.updateLesson(lessonId, request);
-    return ResponseEntity.ok(updated);
+    @PostMapping("/course/{courseId}")
+    public ResponseEntity<MicroLesson> addLesson(
+            @PathVariable Long courseId,
+            @RequestBody RecommendationRequest request) {
+
+        MicroLesson created = lessonService.addLesson(courseId, request);
+        return ResponseEntity.ok(created);
+    }
+
+    @PutMapping("/{lessonId}")
+    public ResponseEntity<MicroLesson> updateLesson(
+            @PathVariable Long lessonId,
+            @RequestBody RecommendationRequest request) {
+
+        MicroLesson updated = lessonService.updateLesson(lessonId, request);
+        return ResponseEntity.ok(updated);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<MicroLesson>> searchLessons(
+            @RequestParam(required = false) String tags,
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) String contentType) {
+
+        return ResponseEntity.ok(
+                lessonService.findLessonsByFilters(tags, difficulty, contentType)
+        );
+    }
+
+    @GetMapping("/{lessonId}")
+    public ResponseEntity<MicroLesson> getLesson(
+            @PathVariable Long lessonId) {
+
+        return ResponseEntity.ok(
+                lessonService.getLesson(lessonId)
+        );
+    }
 }
