@@ -17,13 +17,8 @@ public class MicroLesson {
 
     private String title;
 
-    private String contentType; // VIDEO, TEXT
-
-    private String difficulty; // BEGINNER, INTERMEDIATE, ADVANCED
-
-    private Integer durationMinutes;
-
-    private String tags; // csv: java,spring,jpa
+    @Column(length = 5000)
+    private String content;
 
     @ManyToOne
     @JoinColumn(name = "course_id")
