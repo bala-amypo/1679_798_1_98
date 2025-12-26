@@ -1,9 +1,3 @@
-package com.example.demo.controller;
-
-import com.example.demo.entity.MicroLesson;
-import com.example.demo.service.LessonService;
-import org.springframework.web.bind.annotation.*;
-
 @RestController
 @RequestMapping("/lessons")
 public class LessonController {
@@ -14,9 +8,25 @@ public class LessonController {
         this.service = service;
     }
 
-    @PostMapping("/{courseId}")
+    @PostMapping("/course/{courseId}")
     public MicroLesson add(@PathVariable Long courseId,
-                           @RequestBody MicroLesson m) {
-        return service.addLesson(courseId, m);
+                           @RequestBody MicroLesson lesson) {
+        return service.addLesson(courseId, lesson);
+    }
+
+    @PutMapping("/{lessonId}")
+    public MicroLesson update(@PathVariable Long lessonId,
+                              @RequestBody MicroLesson lesson) {
+        return service.updateLesson(lessonId, lesson);
+    }
+
+    @GetMapping("/{lessonId}")
+    public MicroLesson get(@PathVariable Long lessonId) {
+        return service.getLesson(lessonId);
+    }
+
+    @GetMapping("/search")
+    public List<MicroLesson> search(@RequestParam String keyword) {
+        return service.searchLessons(keyword);
     }
 }
