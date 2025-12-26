@@ -15,9 +15,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User register(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
     public User login(User user) {
-        return userRepository
-                .findByEmail(user.getEmail())
+        return userRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
     }
 }
