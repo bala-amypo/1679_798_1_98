@@ -1,5 +1,4 @@
 package com.example.demo.service.impl;
-
 import com.example.demo.model.Recommendation;
 import com.example.demo.model.User;
 import com.example.demo.repository.CourseRepository;
@@ -8,7 +7,6 @@ import com.example.demo.repository.RecommendationRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.RecommendationService;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -33,7 +31,6 @@ public class RecommendationServiceImpl implements RecommendationService {
         this.progressRepository = progressRepository;
     }
 
-    // ===== REQUIRED BY TEST =====
     @Override
     public Recommendation save(Recommendation recommendation) {
         return recommendationRepository.save(recommendation);
