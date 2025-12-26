@@ -64,15 +64,19 @@ public class ProgressServiceImpl implements ProgressService {
         MicroLesson microLesson = microLessonRepository.findById(lessonId)
             .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
         
-        if (progressUpdate.getProgressPercent() == null || 
-            progressUpdate.getProgressPercent() < 0 || 
-            progressUpdate.getProgressPercent() > 100) {
+        if (progressUpdate.getProgressPercent() == null) {
+            throw new RuntimeException("Progress percent is required");
+        }
+        
+        if (progressUpdate.getProgressPercent() < 0 || progressUpdate.getProgressPercent() > 100) {
             throw new RuntimeException("Progress percent must be between 0 and 100");
         }
         
-        if ("COMPLETED".equals(progressUpdate.getStatus()) && 
-            progressUpdate.getProgressPercent() != 100) {
-            throw new RuntimeException("Progress must be 100% when status is COMPLETED");
+        // Fix: Validate COMPLETED status requires 100% progress
+        if ("COMPLETED".equals(progressUpdate.getStatus())) {
+            if (progressUpdate.getProgressPercent() != 100) {
+                throw new RuntimeException("Progress must be 100% when status is COMPLETED");
+            }
         }
         
         Optional<Progress> existingProgress = progressRepository
@@ -90,16 +94,26 @@ public class ProgressServiceImpl implements ProgressService {
             if (progressUpdate.getScore() != null) {
                 progress.setScore(progressUpdate.getScore());
             }
+            
+            // Set completedAt if status becomes COMPLETED
+            if ("COMPLETED".equals(progressUpdate.getStatus()) && progress.getCompletedAt() == null) {
+                progress.setCompletedAt(java.time.LocalDateTime.now());
+            }
         } else {
             progress = Progress.builder()
                     .user(user)
                     .microLesson(microLesson)
-                    .status(progressUpdate.getStatus())
+                    .status(progressUpdate.getStatus() != null ? progressUpdate.getStatus() : "NOT_STARTED")
                     .progressPercent(progressUpdate.getProgressPercent())
                     .score(progressUpdate.getScore())
                     .build();
+            
+            if ("COMPLETED".equals(progress.getStatus())) {
+                progress.setCompletedAt(java.time.LocalDateTime.now());
+            }
         }
         
+        progress.setLastAccessedAt(java.time.LocalDateTime.now());
         return progressRepository.save(progress);
     }
     

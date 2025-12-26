@@ -11,11 +11,15 @@ public class SimpleStatusServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws IOException {
-        response.setContentType("text/plain");
-        response.setStatus(HttpServletResponse.SC_OK);
-        
-        PrintWriter writer = response.getWriter();
-        writer.write("Servlet Alive");
-        writer.flush();
+        try {
+            response.setContentType("text/plain");
+            response.setStatus(HttpServletResponse.SC_OK);
+            
+            PrintWriter writer = response.getWriter();
+            writer.write("Servlet Alive");
+            writer.flush();
+        } catch (IOException e) {
+            throw new IOException("Servlet writer failed", e);
+        }
     }
 }

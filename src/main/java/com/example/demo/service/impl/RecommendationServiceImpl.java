@@ -86,23 +86,32 @@ public class RecommendationServiceImpl implements RecommendationService {
             .collect(Collectors.toList());
         
         // Apply filters from request
-        candidateLessons = candidateLessons.stream()
-            .filter(lesson -> params.getTags() == null || 
-                    lesson.getTags() == null || 
-                    lesson.getTags().contains(params.getTags()))
-            .filter(lesson -> params.getDifficulty() == null || 
-                    lesson.getDifficulty().equals(params.getDifficulty()))
-            .filter(lesson -> params.getContentType() == null || 
-                    lesson.getContentType().equals(params.getContentType()))
-            .collect(Collectors.toList());
+        if (params.getTags() != null && !params.getTags().isEmpty()) {
+            candidateLessons = candidateLessons.stream()
+                .filter(lesson -> lesson.getTags() != null && 
+                        lesson.getTags().contains(params.getTags()))
+                .collect(Collectors.toList());
+        }
         
-        // Score and rank lessons (simplified algorithm)
+        if (params.getDifficulty() != null && !params.getDifficulty().isEmpty()) {
+            candidateLessons = candidateLessons.stream()
+                .filter(lesson -> lesson.getDifficulty().equals(params.getDifficulty()))
+                .collect(Collectors.toList());
+        }
+        
+        if (params.getContentType() != null && !params.getContentType().isEmpty()) {
+            candidateLessons = candidateLessons.stream()
+                .filter(lesson -> lesson.getContentType().equals(params.getContentType()))
+                .collect(Collectors.toList());
+        }
+        
+        // Score and rank lessons
         List<ScoredLesson> scoredLessons = candidateLessons.stream()
             .map(lesson -> {
                 double score = calculateLessonScore(lesson, user, recentProgress, params);
                 return new ScoredLesson(lesson, score);
             })
-            .sorted((a, b) -> Double.compare(b.score, a.score)) // descending
+            .sorted((a, b) -> Double.compare(b.score, a.score))
             .limit(params.getLimit() != null ? params.getLimit() : 5)
             .collect(Collectors.toList());
         
@@ -111,9 +120,10 @@ public class RecommendationServiceImpl implements RecommendationService {
             .map(sl -> sl.lesson.getId().toString())
             .collect(Collectors.joining(","));
         
-        BigDecimal confidenceScore = scoredLessons.isEmpty() ? 
-            BigDecimal.ZERO : 
-            BigDecimal.valueOf(scoredLessons.get(0).score);
+        double confidence = scoredLessons.isEmpty() ? 0.0 : 
+            scoredLessons.stream().mapToDouble(sl -> sl.score).average().orElse(0.0);
+        
+        BigDecimal confidenceScore = BigDecimal.valueOf(Math.min(confidence, 1.0));
         
         // Create basis snapshot
         String basisSnapshot = String.format(
@@ -138,7 +148,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     private double calculateLessonScore(MicroLesson lesson, User user, 
                                        List<Progress> recentProgress, 
                                        RecommendationRequest params) {
-        double score = 0.5; // Base score
+        double score = 0.5;
         
         // Match with user's preferred learning style
         if (user.getPreferredLearningStyle() != null && 
@@ -166,7 +176,6 @@ public class RecommendationServiceImpl implements RecommendationService {
             score += 0.1;
         }
         
-        // Cap at 1.0
         return Math.min(score, 1.0);
     }
     
@@ -190,7 +199,6 @@ public class RecommendationServiceImpl implements RecommendationService {
         return recommendationRepository.findByUserIdAndGeneratedAtBetween(userId, start, end);
     }
     
-    // Helper class for scoring
     private static class ScoredLesson {
         MicroLesson lesson;
         double score;
