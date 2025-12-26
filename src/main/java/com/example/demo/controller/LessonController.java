@@ -1,12 +1,10 @@
 package com.example.demo.controller;
-
-import org.springframework.web.bind.annotation.*;
+import com.example.demo.model.MicroLesson;
+import com.example.demo.service.LessonService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import com.example.demo.model.Lesson;
-import com.example.demo.service.LessonService;
 
 @RestController
 @RequestMapping("/lessons")
@@ -18,32 +16,29 @@ public class LessonController {
         this.lessonService = lessonService;
     }
 
-    // POST /lessons/course/{courseId}
-    @PostMapping("/course/{courseId}")
-    public ResponseEntity<Lesson> addLesson(
-            @PathVariable Long courseId,
-            @RequestBody Lesson lesson) {
-        return ResponseEntity.ok(lessonService.addLesson(courseId, lesson));
+    // POST /lessons
+    @PostMapping
+    public ResponseEntity<MicroLesson> createLesson(@RequestBody MicroLesson lesson) {
+        return ResponseEntity.ok(lessonService.createLesson(lesson));
     }
 
     // PUT /lessons/{lessonId}
     @PutMapping("/{lessonId}")
-    public ResponseEntity<Lesson> updateLesson(
+    public ResponseEntity<MicroLesson> updateLesson(
             @PathVariable Long lessonId,
-            @RequestBody Lesson lesson) {
+            @RequestBody MicroLesson lesson) {
         return ResponseEntity.ok(lessonService.updateLesson(lessonId, lesson));
     }
 
-    // GET /lessons/search
-    @GetMapping("/search")
-    public ResponseEntity<List<Lesson>> searchLessons(
-            @RequestParam String query) {
-        return ResponseEntity.ok(lessonService.searchLessons(query));
+    // GET /lessons/course/{courseId}
+    @GetMapping("/course/{courseId}")
+    public ResponseEntity<List<MicroLesson>> getLessonsByCourse(@PathVariable Long courseId) {
+        return ResponseEntity.ok(lessonService.getLessonsByCourse(courseId));
     }
 
     // GET /lessons/{lessonId}
     @GetMapping("/{lessonId}")
-    public ResponseEntity<Lesson> getLesson(@PathVariable Long lessonId) {
+    public ResponseEntity<MicroLesson> getLesson(@PathVariable Long lessonId) {
         return ResponseEntity.ok(lessonService.getLessonById(lessonId));
     }
 }
