@@ -1,42 +1,32 @@
 package com.example.demo.controller;
 
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
-
-import java.util.List;
-
 import com.example.demo.model.Progress;
 import com.example.demo.service.ProgressService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/progress")
 public class ProgressController {
 
-    private final ProgressService progressService;
+    @Autowired
+    private ProgressService progressService;
 
-    public ProgressController(ProgressService progressService) {
-        this.progressService = progressService;
+    // POST or PUT progress
+    @PostMapping
+    public Progress saveProgress(@RequestBody Progress progress) {
+        return progressService.saveProgress(progress);
     }
 
-    // POST /progress/{lessonId}
-    @PostMapping("/{lessonId}")
-    public ResponseEntity<Progress> recordProgress(
-            @PathVariable Long lessonId,
-            @RequestBody Progress progress) {
-        return ResponseEntity.ok(progressService.saveOrUpdate(lessonId, progress));
+    // GET progress by MicroLesson ID
+    @GetMapping("/lesson/{id}")
+    public Progress getProgressByLesson(@PathVariable("id") Long lessonId) {
+        return progressService.getProgressByMicroLessonId(lessonId);
     }
 
-    // GET /progress/lesson/{lessonId}
-    @GetMapping("/lesson/{lessonId}")
-    public ResponseEntity<Progress> getLessonProgress(
-            @PathVariable Long lessonId) {
-        return ResponseEntity.ok(progressService.getProgressForLesson(lessonId));
-    }
-
-    // GET /progress/user/{userId}
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Progress>> getUserProgress(
-            @PathVariable Long userId) {
-        return ResponseEntity.ok(progressService.getUserProgress(userId));
+    // GET progress by User ID
+    @GetMapping("/user/{id}")
+    public List<Progress> getProgressByUser(@PathVariable("id") Long userId) {
+        return progressService.getUserProgress(userId);
     }
 }

@@ -14,19 +14,16 @@ public class ProgressServiceImpl implements ProgressService {
     @Autowired
     private ProgressRepository progressRepository;
 
-    // Get progress by MicroLesson ID
     @Override
     public Progress getProgressByMicroLessonId(Long microLessonId) {
         return progressRepository.findByMicroLesson_Id(microLessonId);
     }
 
-    // Get all progress for a specific User ID
     @Override
-    public List<Progress> getProgressByUserId(Long userId) {
+    public List<Progress> getUserProgress(Long userId) {
         return progressRepository.findByUser_Id(userId);
     }
 
-    // Save or update progress
     @Override
     public Progress saveProgress(Progress progress) {
         return progressRepository.save(progress);
