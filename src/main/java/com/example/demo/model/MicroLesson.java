@@ -11,8 +11,8 @@ public class MicroLesson {
     private Long id;
 
     private String title;
+    private String content; // Added to fix getContent() error
 
-    // Optional: bidirectional relationship
     @OneToMany(mappedBy = "microLesson")
     private List<Progress> progresses;
 
@@ -22,6 +22,9 @@ public class MicroLesson {
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 
     public List<Progress> getProgresses() { return progresses; }
     public void setProgresses(List<Progress> progresses) { this.progresses = progresses; }

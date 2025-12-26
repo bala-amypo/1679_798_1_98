@@ -11,10 +11,13 @@ public class Progress {
 
     private int percentage;
 
-    // Link to MicroLesson
     @ManyToOne
-    @JoinColumn(name = "micro_lesson_id") // Foreign key column in DB
+    @JoinColumn(name = "micro_lesson_id")
     private MicroLesson microLesson;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user; // Assuming you have a User entity
 
     // Getters and setters
     public Long getId() { return id; }
@@ -25,4 +28,7 @@ public class Progress {
 
     public MicroLesson getMicroLesson() { return microLesson; }
     public void setMicroLesson(MicroLesson microLesson) { this.microLesson = microLesson; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }
