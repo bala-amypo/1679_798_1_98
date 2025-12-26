@@ -1,7 +1,7 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.entity.Recommendation;
-import com.example.demo.entity.User;
+import com.example.demo.model.Recommendation;
+import com.example.demo.model.User;
 import com.example.demo.repository.RecommendationRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.RecommendationService;
