@@ -1,7 +1,7 @@
 
 package com.example.demo.controller;
 
-import com.example.demo.entity.Progress;
+import com.example.demo.model.Progress;
 import com.example.demo.service.ProgressService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

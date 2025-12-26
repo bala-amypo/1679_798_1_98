@@ -1,7 +1,7 @@
 
 package com.example.demo.controller;
 
-import com.example.demo.entity.Course;
+import com.example.demo.model.Course;
 import com.example.demo.service.CourseService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

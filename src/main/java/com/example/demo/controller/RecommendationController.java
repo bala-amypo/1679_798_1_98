@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.RecommendationRequest;
-import com.example.demo.entity.Recommendation;
+import com.example.demo.model.Recommendation;
 import com.example.demo.service.RecommendationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
