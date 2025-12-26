@@ -1,16 +1,4 @@
-// package com.example.demo.repository;
 
-// import com.example.demo.model.Recommendation;
-// import org.springframework.data.jpa.repository.JpaRepository;
-
-// import java.util.List;
-
-// public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
-
-//     Recommendation findTopByUserIdOrderByCreatedAtDesc(Long userId);
-
-//     List<Recommendation> findByUserId(Long userId);
-// }
 
 package com.example.demo.repository;
 
