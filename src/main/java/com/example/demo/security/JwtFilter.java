@@ -16,7 +16,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        // For now, just pass the request along
+        // Just pass requests through for now
         filterChain.doFilter(request, response);
     }
 }
