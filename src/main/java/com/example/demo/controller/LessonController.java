@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+
 @RestController
 @RequestMapping("/lessons")
 @Tag(name = "Lesson Management")
@@ -16,6 +17,7 @@ public class LessonController {
 
     private final LessonService lessonService;
 
+    // Add lesson to a course
     @PostMapping("/course/{courseId}")
     public ResponseEntity<MicroLesson> addLesson(
             @PathVariable Long courseId,
@@ -25,6 +27,7 @@ public class LessonController {
         return ResponseEntity.ok(created);
     }
 
+    // Update existing lesson
     @PutMapping("/{lessonId}")
     public ResponseEntity<MicroLesson> updateLesson(
             @PathVariable Long lessonId,
@@ -34,6 +37,7 @@ public class LessonController {
         return ResponseEntity.ok(updated);
     }
 
+    // Search lessons with optional filters
     @GetMapping("/search")
     public ResponseEntity<List<MicroLesson>> searchLessons(
             @RequestParam(required = false) String tags,
@@ -45,6 +49,7 @@ public class LessonController {
         );
     }
 
+    // Get single lesson by ID
     @GetMapping("/{lessonId}")
     public ResponseEntity<MicroLesson> getLesson(
             @PathVariable Long lessonId) {

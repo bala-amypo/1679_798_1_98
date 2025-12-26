@@ -13,15 +13,15 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class RecommendationRequest {
 
-    // USED FOR LESSON CREATE / UPDATE
+    // Lesson fields
     private String title;
-    private Integer durationMinutes;
+    private Integer durationMinutes; // integer, optional
     private String contentType;
     private String difficulty;
-    private String tags;
+    private String tags; // comma-separated string
     private LocalDate publishDate;
 
-    // OPTIONAL: still usable for recommendations if needed
+    // Optional/redundant fields ignored by backend
     private Integer limit;
     private String preferredLearningStyle;
 }
