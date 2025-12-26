@@ -1,25 +1,41 @@
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+
+import com.example.demo.model.Recommendation;
+import com.example.demo.service.RecommendationService;
+
 @RestController
 @RequestMapping("/recommendations")
 public class RecommendationController {
 
-    private final RecommendationService service;
+    private final RecommendationService recommendationService;
 
-    public RecommendationController(RecommendationService service) {
-        this.service = service;
+    public RecommendationController(RecommendationService recommendationService) {
+        this.recommendationService = recommendationService;
     }
 
+    // POST /recommendations/generate
     @PostMapping("/generate")
-    public Recommendation generate(@RequestBody Recommendation r) {
-        return service.generate(r);
+    public ResponseEntity<Recommendation> generateRecommendation(
+            @RequestParam Long userId) {
+        return ResponseEntity.ok(recommendationService.generate(userId));
     }
 
-    @GetMapping("/latest/{userId}")
-    public Recommendation latest(@PathVariable Long userId) {
-        return service.getLatestRecommendation(userId);
+    // GET /recommendations/latest
+    @GetMapping("/latest")
+    public ResponseEntity<Recommendation> getLatestRecommendation(
+            @RequestParam Long userId) {
+        return ResponseEntity.ok(recommendationService.getLatest(userId));
     }
 
+    // GET /recommendations/user/{userId}
     @GetMapping("/user/{userId}")
-    public List<Recommendation> all(@PathVariable Long userId) {
-        return service.getUserRecommendations(userId);
+    public ResponseEntity<List<Recommendation>> getUserRecommendations(
+            @PathVariable Long userId) {
+        return ResponseEntity.ok(recommendationService.getUserRecommendations(userId));
     }
 }

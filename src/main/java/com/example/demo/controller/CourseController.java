@@ -1,31 +1,47 @@
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+
+import com.example.demo.model.Course;
+import com.example.demo.service.CourseService;
+
 @RestController
 @RequestMapping("/courses")
 public class CourseController {
 
-    private final CourseService service;
+    private final CourseService courseService;
 
-    public CourseController(CourseService service) {
-        this.service = service;
+    public CourseController(CourseService courseService) {
+        this.courseService = courseService;
     }
 
+    // POST /courses
     @PostMapping
-    public Course create(@RequestBody Course course) {
-        return service.createCourse(course);
+    public ResponseEntity<Course> createCourse(@RequestBody Course course) {
+        return ResponseEntity.ok(courseService.createCourse(course));
     }
 
+    // PUT /courses/{courseId}
     @PutMapping("/{courseId}")
-    public Course update(@PathVariable Long courseId,
-                         @RequestBody Course course) {
-        return service.updateCourse(courseId, course);
+    public ResponseEntity<Course> updateCourse(
+            @PathVariable Long courseId,
+            @RequestBody Course course) {
+        return ResponseEntity.ok(courseService.updateCourse(courseId, course));
     }
 
-    @GetMapping("/{courseId}")
-    public Course get(@PathVariable Long courseId) {
-        return service.getCourse(courseId);
-    }
-
+    // GET /courses/instructor/{instructorId}
     @GetMapping("/instructor/{instructorId}")
-    public List<Course> byInstructor(@PathVariable Long instructorId) {
-        return service.getInstructorCourses(instructorId);
+    public ResponseEntity<List<Course>> getInstructorCourses(
+            @PathVariable Long instructorId) {
+        return ResponseEntity.ok(courseService.getCoursesByInstructor(instructorId));
+    }
+
+    // GET /courses/{courseId}
+    @GetMapping("/{courseId}")
+    public ResponseEntity<Course> getCourse(@PathVariable Long courseId) {
+        return ResponseEntity.ok(courseService.getCourseById(courseId));
     }
 }
