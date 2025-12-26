@@ -21,7 +21,5 @@ public class RecommendationRequest {
     private String tags; // comma-separated string
     private LocalDate publishDate;
 
-    // Optional/redundant fields ignored by backend
-    private Integer limit;
-    private String preferredLearningStyle;
+
 }
