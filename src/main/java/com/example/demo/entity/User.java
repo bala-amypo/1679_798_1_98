@@ -19,23 +19,18 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false, length = 100)
     private String fullName;
     
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
     
-    @Column(nullable = false)
     private String password;
     
-    @Column(nullable = false)
-    @Builder.Default
-    private String role = "LEARNER";
+    private String role;
     
-    @Column(length = 50)
     private String preferredLearningStyle;
     
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
     
     @PrePersist

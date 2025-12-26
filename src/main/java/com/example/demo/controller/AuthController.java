@@ -1,29 +1,3 @@
-// package com.example.demo.controller;
-
-// import com.example.demo.dto.AuthResponse;
-// import com.example.demo.model.User;
-// import com.example.demo.service.UserService;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.*;
-
-// @RestController
-// @RequestMapping("/auth")
-// public class AuthController {
-
-//     private final UserService service;
-
-//     public AuthController(UserService service) {
-//         this.service = service;
-//     }
-
-//     @PostMapping("/register")
-//     public ResponseEntity<AuthResponse> register(@RequestBody User user) {
-//         service.register(user);
-//         return ResponseEntity.ok(new AuthResponse("REGISTER_SUCCESS"));
-//     }
-// }
-
-
 package com.example.demo.controller;
 
 import com.example.demo.dto.AuthResponse;
@@ -44,14 +18,24 @@ public class AuthController {
     private final UserService userService;
     
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        User registeredUser = userService.register(user);
-        return ResponseEntity.ok(registeredUser);
+    public ResponseEntity<?> register(@RequestBody User user) {
+        try {
+            User registeredUser = userService.register(user);
+            return ResponseEntity.ok(registeredUser);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body("Error: " + e.getMessage());
+        }
     }
     
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
-        AuthResponse response = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            AuthResponse response = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body("Error: " + e.getMessage());
+        }
     }
 }
