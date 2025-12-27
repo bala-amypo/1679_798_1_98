@@ -1,11 +1,9 @@
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -18,28 +16,18 @@ public class MicroLesson {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    private Course course;
+
     private String title;
 
     private Integer durationMinutes;
 
-    private String contentType;
+    private String contentType; // VIDEO / TEXT
 
-    private String difficulty;
+    private String difficulty; // BEGINNER / INTERMEDIATE / ADVANCED
 
-    private String tags; // comma-separated
+    private String tags;
 
     private LocalDate publishDate;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "instructor"})
-    private Course course;
-
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
 }

@@ -1,14 +1,16 @@
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,42 +20,32 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "full_name")
+    @Column(nullable = false, length = 100)
     private String fullName;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(nullable = false)
-    @Builder.Default
-    private String role = "LEARNER";
+    private String role;
 
-    @Column(name = "preferred_learning_style", length = 50)
+    @Column(length = 50)
     private String preferredLearningStyle;
 
-    @Column(name = "created_at")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime createdAt;
 
+    @OneToMany(mappedBy = "instructor")
+    @JsonIgnore   
+    private List<Course> courses;
+
     @PrePersist
-    protected void onCreate() {
+    public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        if (this.role == null || this.role.trim().isEmpty()) {
+        if (this.role == null) {
             this.role = "LEARNER";
         }
-    }
-
- 
-    public void prePersist() {
-        onCreate();
-    }
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public Long getId() {
-        return id;
     }
 }

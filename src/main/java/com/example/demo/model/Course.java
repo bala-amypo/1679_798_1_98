@@ -1,18 +1,14 @@
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;   // ✅ ADD THIS
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-    name = "courses",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"title", "instructor_id"})
-)
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,35 +18,22 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 150)
     @Column(nullable = false)
     private String title;
 
-    @Size(max = 500)
     private String description;
 
-    // ✅ FIX IS HERE
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "instructor_id", nullable = false)
-    @JsonIgnore
-    private User instructor;
-
-    @NotBlank
-    @Size(max = 50)
-    @Column(nullable = false)
     private String category;
 
-    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+    @ManyToOne
+    @JoinColumn(name = "instructor_id")
+    @JsonIgnoreProperties({"courses"}) // 🔥 FIX
+    private User instructor;
 
-    // 🔥 REQUIRED BY TEST
+    @PrePersist
     public void prePersist() {
-        onCreate();
+        this.createdAt = LocalDateTime.now();
     }
 }
