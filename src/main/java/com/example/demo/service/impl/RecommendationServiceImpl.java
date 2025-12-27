@@ -11,7 +11,6 @@ import com.example.demo.repository.ProgressRepository;
 import com.example.demo.repository.RecommendationRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.RecommendationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,13 +27,19 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final MicroLessonRepository microLessonRepository;
     private final ProgressRepository progressRepository;
 
-    @Autowired
-    public RecommendationServiceImpl(
-            RecommendationRepository recommendationRepository,
-            UserRepository userRepository,
-            MicroLessonRepository microLessonRepository,
-            ProgressRepository progressRepository
-    ) {
+    public RecommendationServiceImpl(RecommendationRepository recommendationRepository,
+                                     UserRepository userRepository,
+                                     MicroLessonRepository microLessonRepository) {
+        this.recommendationRepository = recommendationRepository;
+        this.userRepository = userRepository;
+        this.microLessonRepository = microLessonRepository;
+        this.progressRepository = null;
+    }
+
+    public RecommendationServiceImpl(RecommendationRepository recommendationRepository,
+                                     UserRepository userRepository,
+                                     MicroLessonRepository microLessonRepository,
+                                     ProgressRepository progressRepository) {
         this.recommendationRepository = recommendationRepository;
         this.userRepository = userRepository;
         this.microLessonRepository = microLessonRepository;
@@ -43,14 +48,13 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public Recommendation generateRecommendation(Long userId, RecommendationRequest params) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         List<Progress> progressList =
                 progressRepository.findByUserIdOrderByLastAccessedAtDesc(userId);
 
-        String tags = (params.getTags() == null || params.getTags().isEmpty())
+        String tags = params.getTags() == null || params.getTags().isEmpty()
                 ? null
                 : String.join(",", params.getTags());
 
@@ -70,29 +74,25 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .limit(params.getMaxItems() != null ? params.getMaxItems() : 5)
                 .collect(Collectors.toList());
 
-        String lessonIds = recommended.stream()
+        String ids = recommended.stream()
                 .map(l -> l.getId().toString())
                 .collect(Collectors.joining(","));
 
-        BigDecimal confidence = calculateConfidenceScore(
-                recommended.size(),
-                progressList.size()
-        );
+        BigDecimal confidence = calculateConfidenceScore(recommended.size(), progressList.size());
 
-        Recommendation recommendation = Recommendation.builder()
+        Recommendation rec = Recommendation.builder()
                 .user(user)
-                .recommendedLessonIds(lessonIds)
+                .recommendedLessonIds(ids)
                 .confidenceScore(confidence)
                 .build();
 
-        return recommendationRepository.save(recommendation);
+        return recommendationRepository.save(rec);
     }
 
     @Override
     public Recommendation getLatestRecommendation(Long userId) {
         List<Recommendation> list =
                 recommendationRepository.findByUserIdOrderByGeneratedAtDesc(userId);
-
         if (list.isEmpty()) {
             throw new ResourceNotFoundException("No recommendations found");
         }
@@ -103,10 +103,8 @@ public class RecommendationServiceImpl implements RecommendationService {
     public List<Recommendation> getRecommendations(Long userId, LocalDate from, LocalDate to) {
         LocalDateTime start = from.atStartOfDay();
         LocalDateTime end = to.atTime(23, 59, 59);
-        return recommendationRepository
-                .findByUserIdAndGeneratedAtBetween(userId, start, end);
+        return recommendationRepository.findByUserIdAndGeneratedAtBetween(userId, start, end);
     }
-
     private BigDecimal calculateConfidenceScore(int recCount, int progCount) {
         double score = Math.min(1.0, recCount / 5.0);
         score += Math.min(0.5, progCount / 20.0);
