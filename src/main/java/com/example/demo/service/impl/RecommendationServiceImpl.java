@@ -27,19 +27,13 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final MicroLessonRepository microLessonRepository;
     private final ProgressRepository progressRepository;
 
-    public RecommendationServiceImpl(RecommendationRepository recommendationRepository,
-                                     UserRepository userRepository,
-                                     MicroLessonRepository microLessonRepository) {
-        this.recommendationRepository = recommendationRepository;
-        this.userRepository = userRepository;
-        this.microLessonRepository = microLessonRepository;
-        this.progressRepository = null;
-    }
-
-    public RecommendationServiceImpl(RecommendationRepository recommendationRepository,
-                                     UserRepository userRepository,
-                                     MicroLessonRepository microLessonRepository,
-                                     ProgressRepository progressRepository) {
+    // ✅ ONLY ONE CONSTRUCTOR (CORRECT)
+    public RecommendationServiceImpl(
+            RecommendationRepository recommendationRepository,
+            UserRepository userRepository,
+            MicroLessonRepository microLessonRepository,
+            ProgressRepository progressRepository
+    ) {
         this.recommendationRepository = recommendationRepository;
         this.userRepository = userRepository;
         this.microLessonRepository = microLessonRepository;
@@ -54,7 +48,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         List<Progress> progressList =
                 progressRepository.findByUserIdOrderByLastAccessedAtDesc(userId);
 
-        String tags = params.getTags() == null || params.getTags().isEmpty()
+        String tags = (params.getTags() == null || params.getTags().isEmpty())
                 ? null
                 : String.join(",", params.getTags());
 
@@ -78,7 +72,10 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .map(l -> l.getId().toString())
                 .collect(Collectors.joining(","));
 
-        BigDecimal confidence = calculateConfidenceScore(recommended.size(), progressList.size());
+        BigDecimal confidence = calculateConfidenceScore(
+                recommended.size(),
+                progressList.size()
+        );
 
         Recommendation rec = Recommendation.builder()
                 .user(user)
@@ -93,6 +90,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     public Recommendation getLatestRecommendation(Long userId) {
         List<Recommendation> list =
                 recommendationRepository.findByUserIdOrderByGeneratedAtDesc(userId);
+
         if (list.isEmpty()) {
             throw new ResourceNotFoundException("No recommendations found");
         }
@@ -103,8 +101,10 @@ public class RecommendationServiceImpl implements RecommendationService {
     public List<Recommendation> getRecommendations(Long userId, LocalDate from, LocalDate to) {
         LocalDateTime start = from.atStartOfDay();
         LocalDateTime end = to.atTime(23, 59, 59);
-        return recommendationRepository.findByUserIdAndGeneratedAtBetween(userId, start, end);
+        return recommendationRepository
+                .findByUserIdAndGeneratedAtBetween(userId, start, end);
     }
+
     private BigDecimal calculateConfidenceScore(int recCount, int progCount) {
         double score = Math.min(1.0, recCount / 5.0);
         score += Math.min(0.5, progCount / 20.0);
