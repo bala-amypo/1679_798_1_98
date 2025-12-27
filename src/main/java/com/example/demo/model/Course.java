@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;   // ✅ ADD THIS
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -29,8 +30,10 @@ public class Course {
     @Size(max = 500)
     private String description;
 
+    // ✅ FIX IS HERE
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instructor_id", nullable = false)
+    @JsonIgnore
     private User instructor;
 
     @NotBlank
