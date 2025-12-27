@@ -43,7 +43,8 @@ public class SecurityConfig {
                     "/api-docs/**",
                     "/webjars/**",
                     "/status-servlet",
-                    "/lessons/course/**"
+                    "/lessons/course/**",
+                    "/courses/**"      // <-- added this line to allow POST /courses
                 ).permitAll()
                 .anyRequest().authenticated()
             );
