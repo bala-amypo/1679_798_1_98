@@ -105,7 +105,6 @@ public class RecommendationServiceImpl implements RecommendationService {
         LocalDateTime end = to.atTime(23, 59, 59);
         return recommendationRepository.findByUserIdAndGeneratedAtBetween(userId, start, end);
     }
-
     private BigDecimal calculateConfidenceScore(int recCount, int progCount) {
         double score = Math.min(1.0, recCount / 5.0);
         score += Math.min(0.5, progCount / 20.0);
