@@ -27,7 +27,7 @@ public class RecommendationController {
     // existing
     @GetMapping("/latest/{userId}")
     public Recommendation latest(@PathVariable Long userId) {
-        return recommendationServ ice.getLatestRecommendation(userId);
+        return recommendationService.getLatestRecommendation(userId);
     }
 
     // STEP-5 REQUIRED (added)
