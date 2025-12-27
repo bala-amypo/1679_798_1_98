@@ -1,5 +1,4 @@
 package com.example.demo.service.impl;
-
 import com.example.demo.dto.RecommendationRequest;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.MicroLesson;
@@ -12,7 +11,6 @@ import com.example.demo.repository.RecommendationRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.RecommendationService;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -105,6 +103,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         LocalDateTime end = to.atTime(23, 59, 59);
         return recommendationRepository.findByUserIdAndGeneratedAtBetween(userId, start, end);
     }
+
     private BigDecimal calculateConfidenceScore(int recCount, int progCount) {
         double score = Math.min(1.0, recCount / 5.0);
         score += Math.min(0.5, progCount / 20.0);
