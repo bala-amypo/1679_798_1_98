@@ -1,4 +1,3 @@
-
 package com.example.demo.controller;
 
 import com.example.demo.model.Course;
@@ -14,9 +13,13 @@ import java.util.List;
 @Tag(name = "Course Management")
 @RequiredArgsConstructor
 public class CourseController {
-    
+
     private final CourseService courseService;
-    
+
+    /**
+     * Create a new course
+     * Example: POST /courses?instructorId=1
+     */
     @PostMapping
     public ResponseEntity<Course> createCourse(
             @RequestBody Course course,
@@ -24,7 +27,11 @@ public class CourseController {
         Course created = courseService.createCourse(course, instructorId);
         return ResponseEntity.ok(created);
     }
-    
+
+    /**
+     * Update an existing course
+     * Example: PUT /courses/1
+     */
     @PutMapping("/{courseId}")
     public ResponseEntity<Course> updateCourse(
             @PathVariable Long courseId,
@@ -32,14 +39,22 @@ public class CourseController {
         Course updated = courseService.updateCourse(courseId, course);
         return ResponseEntity.ok(updated);
     }
-    
+
+    /**
+     * Get all courses by instructor
+     * Example: GET /courses/instructor/1
+     */
     @GetMapping("/instructor/{instructorId}")
     public ResponseEntity<List<Course>> getInstructorCourses(
             @PathVariable Long instructorId) {
         List<Course> courses = courseService.listCoursesByInstructor(instructorId);
         return ResponseEntity.ok(courses);
     }
-    
+
+    /**
+     * Get a course by ID
+     * Example: GET /courses/1
+     */
     @GetMapping("/{courseId}")
     public ResponseEntity<Course> getCourse(@PathVariable Long courseId) {
         Course course = courseService.getCourse(courseId);
