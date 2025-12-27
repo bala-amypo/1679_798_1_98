@@ -27,7 +27,6 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final MicroLessonRepository microLessonRepository;
     private final ProgressRepository progressRepository;
 
-    // ✅ ONLY ONE CONSTRUCTOR — NO NULLS
     public RecommendationServiceImpl(
             RecommendationRepository recommendationRepository,
             UserRepository userRepository,
@@ -100,6 +99,12 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public List<Recommendation> getRecommendations(Long userId, LocalDate from, LocalDate to) {
+
+        // ✅ FIX: handle null dates (controller passes null)
+        if (from == null || to == null) {
+            return recommendationRepository
+                    .findByUserIdOrderByGeneratedAtDesc(userId);
+        }
 
         LocalDateTime start = from.atStartOfDay();
         LocalDateTime end = to.atTime(23, 59, 59);
