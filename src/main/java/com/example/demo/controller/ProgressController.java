@@ -1,4 +1,3 @@
-
 package com.example.demo.controller;
 
 import com.example.demo.model.Progress;
@@ -14,9 +13,10 @@ import java.util.List;
 @Tag(name = "Progress Tracking")
 @RequiredArgsConstructor
 public class ProgressController {
-    
+
     private final ProgressService progressService;
-    
+
+    // Record user progress for a lesson
     @PostMapping("/{lessonId}")
     public ResponseEntity<Progress> recordProgress(
             @PathVariable Long lessonId,
@@ -25,7 +25,8 @@ public class ProgressController {
         Progress recorded = progressService.recordProgress(userId, lessonId, progress);
         return ResponseEntity.ok(recorded);
     }
-    
+
+    // Get progress of a lesson for a user
     @GetMapping("/lesson/{lessonId}")
     public ResponseEntity<Progress> getProgress(
             @PathVariable Long lessonId,
@@ -33,7 +34,8 @@ public class ProgressController {
         Progress progress = progressService.getProgress(userId, lessonId);
         return ResponseEntity.ok(progress);
     }
-    
+
+    // Get all progress for a user
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Progress>> getUserProgress(@PathVariable Long userId) {
         List<Progress> progressList = progressService.getUserProgress(userId);

@@ -16,10 +16,8 @@ public class CourseController {
 
     private final CourseService courseService;
 
-    /**
-     * Create a new course
-     * Example: POST /courses?instructorId=1
-     */
+    // Create a new course
+    // Swagger usage: POST /courses?instructorId=1
     @PostMapping
     public ResponseEntity<Course> createCourse(
             @RequestBody Course course,
@@ -28,10 +26,7 @@ public class CourseController {
         return ResponseEntity.ok(created);
     }
 
-    /**
-     * Update an existing course
-     * Example: PUT /courses/1
-     */
+    // Update an existing course
     @PutMapping("/{courseId}")
     public ResponseEntity<Course> updateCourse(
             @PathVariable Long courseId,
@@ -40,10 +35,7 @@ public class CourseController {
         return ResponseEntity.ok(updated);
     }
 
-    /**
-     * Get all courses by instructor
-     * Example: GET /courses/instructor/1
-     */
+    // Get all courses by instructor
     @GetMapping("/instructor/{instructorId}")
     public ResponseEntity<List<Course>> getInstructorCourses(
             @PathVariable Long instructorId) {
@@ -51,10 +43,7 @@ public class CourseController {
         return ResponseEntity.ok(courses);
     }
 
-    /**
-     * Get a course by ID
-     * Example: GET /courses/1
-     */
+    // Get a course by ID
     @GetMapping("/{courseId}")
     public ResponseEntity<Course> getCourse(@PathVariable Long courseId) {
         Course course = courseService.getCourse(courseId);

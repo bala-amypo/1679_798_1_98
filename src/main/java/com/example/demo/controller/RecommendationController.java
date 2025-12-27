@@ -15,9 +15,10 @@ import java.util.List;
 @Tag(name = "Recommendations")
 @RequiredArgsConstructor
 public class RecommendationController {
-    
+
     private final RecommendationService recommendationService;
-    
+
+    // Generate recommendation for a user
     @PostMapping("/generate")
     public ResponseEntity<Recommendation> generateRecommendation(
             @RequestParam Long userId,
@@ -25,13 +26,15 @@ public class RecommendationController {
         Recommendation recommendation = recommendationService.generateRecommendation(userId, request);
         return ResponseEntity.ok(recommendation);
     }
-    
+
+    // Get latest recommendation for a user
     @GetMapping("/latest")
     public ResponseEntity<Recommendation> getLatestRecommendation(@RequestParam Long userId) {
         Recommendation recommendation = recommendationService.getLatestRecommendation(userId);
         return ResponseEntity.ok(recommendation);
     }
-    
+
+    // Get all recommendations for a user in a date range
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Recommendation>> getRecommendations(
             @PathVariable Long userId,

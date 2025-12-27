@@ -18,11 +18,11 @@ public class LessonController {
     private final LessonService lessonService;
 
     // Add lesson to a course
+    // POST /lessons/course/{courseId}
     @PostMapping("/course/{courseId}")
     public ResponseEntity<MicroLesson> addLesson(
             @PathVariable Long courseId,
             @RequestBody RecommendationRequest request) {
-
         MicroLesson created = lessonService.addLesson(courseId, request);
         return ResponseEntity.ok(created);
     }
@@ -32,7 +32,6 @@ public class LessonController {
     public ResponseEntity<MicroLesson> updateLesson(
             @PathVariable Long lessonId,
             @RequestBody RecommendationRequest request) {
-
         MicroLesson updated = lessonService.updateLesson(lessonId, request);
         return ResponseEntity.ok(updated);
     }
@@ -43,7 +42,6 @@ public class LessonController {
             @RequestParam(required = false) String tags,
             @RequestParam(required = false) String difficulty,
             @RequestParam(required = false) String contentType) {
-
         return ResponseEntity.ok(
                 lessonService.findLessonsByFilters(tags, difficulty, contentType)
         );
@@ -51,11 +49,7 @@ public class LessonController {
 
     // Get single lesson by ID
     @GetMapping("/{lessonId}")
-    public ResponseEntity<MicroLesson> getLesson(
-            @PathVariable Long lessonId) {
-
-        return ResponseEntity.ok(
-                lessonService.getLesson(lessonId)
-        );
+    public ResponseEntity<MicroLesson> getLesson(@PathVariable Long lessonId) {
+        return ResponseEntity.ok(lessonService.getLesson(lessonId));
     }
 }
