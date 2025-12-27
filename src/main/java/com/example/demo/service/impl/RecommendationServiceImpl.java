@@ -1,4 +1,5 @@
 package com.example.demo.service.impl;
+
 import com.example.demo.dto.RecommendationRequest;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.MicroLesson;
@@ -11,6 +12,7 @@ import com.example.demo.repository.RecommendationRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.RecommendationService;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,19 +27,13 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final MicroLessonRepository microLessonRepository;
     private final ProgressRepository progressRepository;
 
-    public RecommendationServiceImpl(RecommendationRepository recommendationRepository,
-                                     UserRepository userRepository,
-                                     MicroLessonRepository microLessonRepository) {
-        this.recommendationRepository = recommendationRepository;
-        this.userRepository = userRepository;
-        this.microLessonRepository = microLessonRepository;
-        this.progressRepository = null;
-    }
+    // ✅ ONLY ONE CONSTRUCTOR — NO NULLS
+    public RecommendationServiceImpl(
+            RecommendationRepository recommendationRepository,
+            UserRepository userRepository,
+            MicroLessonRepository microLessonRepository,
+            ProgressRepository progressRepository) {
 
-    public RecommendationServiceImpl(RecommendationRepository recommendationRepository,
-                                     UserRepository userRepository,
-                                     MicroLessonRepository microLessonRepository,
-                                     ProgressRepository progressRepository) {
         this.recommendationRepository = recommendationRepository;
         this.userRepository = userRepository;
         this.microLessonRepository = microLessonRepository;
@@ -46,13 +42,14 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public Recommendation generateRecommendation(Long userId, RecommendationRequest params) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         List<Progress> progressList =
                 progressRepository.findByUserIdOrderByLastAccessedAtDesc(userId);
 
-        String tags = params.getTags() == null || params.getTags().isEmpty()
+        String tags = (params.getTags() == null || params.getTags().isEmpty())
                 ? null
                 : String.join(",", params.getTags());
 
@@ -62,51 +59,62 @@ public class RecommendationServiceImpl implements RecommendationService {
                 params.getContentType()
         );
 
-        List<Long> completedIds = progressList.stream()
+        List<Long> completedLessonIds = progressList.stream()
                 .filter(p -> "COMPLETED".equals(p.getStatus()))
                 .map(p -> p.getMicroLesson().getId())
                 .collect(Collectors.toList());
 
-        List<MicroLesson> recommended = candidates.stream()
-                .filter(l -> !completedIds.contains(l.getId()))
+        List<MicroLesson> recommendedLessons = candidates.stream()
+                .filter(l -> !completedLessonIds.contains(l.getId()))
                 .limit(params.getMaxItems() != null ? params.getMaxItems() : 5)
                 .collect(Collectors.toList());
 
-        String ids = recommended.stream()
+        String recommendedIds = recommendedLessons.stream()
                 .map(l -> l.getId().toString())
                 .collect(Collectors.joining(","));
 
-        BigDecimal confidence = calculateConfidenceScore(recommended.size(), progressList.size());
+        BigDecimal confidenceScore =
+                calculateConfidenceScore(recommendedLessons.size(), progressList.size());
 
-        Recommendation rec = Recommendation.builder()
+        Recommendation recommendation = Recommendation.builder()
                 .user(user)
-                .recommendedLessonIds(ids)
-                .confidenceScore(confidence)
+                .recommendedLessonIds(recommendedIds)
+                .confidenceScore(confidenceScore)
                 .build();
 
-        return recommendationRepository.save(rec);
+        return recommendationRepository.save(recommendation);
     }
 
     @Override
     public Recommendation getLatestRecommendation(Long userId) {
+
         List<Recommendation> list =
                 recommendationRepository.findByUserIdOrderByGeneratedAtDesc(userId);
+
         if (list.isEmpty()) {
             throw new ResourceNotFoundException("No recommendations found");
         }
+
         return list.get(0);
     }
 
     @Override
     public List<Recommendation> getRecommendations(Long userId, LocalDate from, LocalDate to) {
+
         LocalDateTime start = from.atStartOfDay();
         LocalDateTime end = to.atTime(23, 59, 59);
-        return recommendationRepository.findByUserIdAndGeneratedAtBetween(userId, start, end);
+
+        return recommendationRepository
+                .findByUserIdAndGeneratedAtBetween(userId, start, end);
     }
 
-    private BigDecimal calculateConfidenceScore(int recCount, int progCount) {
-        double score = Math.min(1.0, recCount / 5.0);
-        score += Math.min(0.5, progCount / 20.0);
-        return BigDecimal.valueOf(Math.max(0.1, Math.min(1.0, score)));
+    private BigDecimal calculateConfidenceScore(int recommendedCount, int progressCount) {
+
+        double score = Math.min(1.0, recommendedCount / 5.0);
+        score += Math.min(0.5, progressCount / 20.0);
+
+        return BigDecimal.valueOf(
+                Math.max(0.1, Math.min(1.0, score))
+        );
     }
 }
