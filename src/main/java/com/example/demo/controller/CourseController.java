@@ -2,51 +2,43 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Course;
 import com.example.demo.service.CourseService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/courses")
-@Tag(name = "Course Management")
-@RequiredArgsConstructor
 public class CourseController {
 
     private final CourseService courseService;
 
-    // Create a new course
-    // Swagger usage: POST /courses?instructorId=1
+    public CourseController(CourseService courseService) {
+        this.courseService = courseService;
+    }
+
+    // existing
     @PostMapping
-    public ResponseEntity<Course> createCourse(
-            @RequestBody Course course,
-            @RequestParam Long instructorId) {
-        Course created = courseService.createCourse(course, instructorId);
-        return ResponseEntity.ok(created);
+    public Course createCourse(@RequestBody Course course,
+                               @RequestParam Long instructorId) {
+        return courseService.createCourse(course, instructorId);
     }
 
-    // Update an existing course
+    // existing
+    @GetMapping("/{id}")
+    public Course getCourse(@PathVariable Long id) {
+        return courseService.getCourse(id);
+    }
+
+    // STEP-5 REQUIRED (added)
     @PutMapping("/{courseId}")
-    public ResponseEntity<Course> updateCourse(
-            @PathVariable Long courseId,
-            @RequestBody Course course) {
-        Course updated = courseService.updateCourse(courseId, course);
-        return ResponseEntity.ok(updated);
+    public Course updateCourse(@PathVariable Long courseId,
+                               @RequestBody Course course) {
+        return courseService.updateCourse(courseId, course);
     }
 
-    // Get all courses by instructor
+    // STEP-5 REQUIRED (added)
     @GetMapping("/instructor/{instructorId}")
-    public ResponseEntity<List<Course>> getInstructorCourses(
-            @PathVariable Long instructorId) {
-        List<Course> courses = courseService.listCoursesByInstructor(instructorId);
-        return ResponseEntity.ok(courses);
-    }
-
-    // Get a course by ID
-    @GetMapping("/{courseId}")
-    public ResponseEntity<Course> getCourse(@PathVariable Long courseId) {
-        Course course = courseService.getCourse(courseId);
-        return ResponseEntity.ok(course);
+    public List<Course> getInstructorCourses(@PathVariable Long instructorId) {
+        return courseService.listCoursesByInstructor(instructorId);
     }
 }

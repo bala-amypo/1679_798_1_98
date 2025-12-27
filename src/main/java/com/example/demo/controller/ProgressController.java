@@ -2,43 +2,38 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Progress;
 import com.example.demo.service.ProgressService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/progress")
-@Tag(name = "Progress Tracking")
-@RequiredArgsConstructor
 public class ProgressController {
 
     private final ProgressService progressService;
 
-    // Record user progress for a lesson
-    @PostMapping("/{lessonId}")
-    public ResponseEntity<Progress> recordProgress(
-            @PathVariable Long lessonId,
-            @RequestParam Long userId,
-            @RequestBody Progress progress) {
-        Progress recorded = progressService.recordProgress(userId, lessonId, progress);
-        return ResponseEntity.ok(recorded);
+    public ProgressController(ProgressService progressService) {
+        this.progressService = progressService;
     }
 
-    // Get progress of a lesson for a user
+    // existing
+    @PostMapping
+    public Progress recordProgress(@RequestParam Long userId,
+                                   @RequestParam Long lessonId,
+                                   @RequestBody Progress progress) {
+        return progressService.recordProgress(userId, lessonId, progress);
+    }
+
+    // existing
+    @GetMapping("/{userId}")
+    public List<Progress> getUserProgress(@PathVariable Long userId) {
+        return progressService.getUserProgress(userId);
+    }
+
+    // STEP-5 REQUIRED (added)
     @GetMapping("/lesson/{lessonId}")
-    public ResponseEntity<Progress> getProgress(
-            @PathVariable Long lessonId,
-            @RequestParam Long userId) {
-        Progress progress = progressService.getProgress(userId, lessonId);
-        return ResponseEntity.ok(progress);
-    }
-
-    // Get all progress for a user
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Progress>> getUserProgress(@PathVariable Long userId) {
-        List<Progress> progressList = progressService.getUserProgress(userId);
-        return ResponseEntity.ok(progressList);
+    public Progress getLessonProgress(@PathVariable Long lessonId,
+                                      @RequestParam Long userId) {
+        return progressService.getProgress(userId, lessonId);
     }
 }

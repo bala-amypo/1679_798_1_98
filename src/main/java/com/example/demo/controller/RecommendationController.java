@@ -3,44 +3,36 @@ package com.example.demo.controller;
 import com.example.demo.dto.RecommendationRequest;
 import com.example.demo.model.Recommendation;
 import com.example.demo.service.RecommendationService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDate;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/recommendations")
-@Tag(name = "Recommendations")
-@RequiredArgsConstructor
 public class RecommendationController {
 
     private final RecommendationService recommendationService;
 
-    // Generate recommendation for a user
-    @PostMapping("/generate")
-    public ResponseEntity<Recommendation> generateRecommendation(
-            @RequestParam Long userId,
-            @RequestBody RecommendationRequest request) {
-        Recommendation recommendation = recommendationService.generateRecommendation(userId, request);
-        return ResponseEntity.ok(recommendation);
+    public RecommendationController(RecommendationService recommendationService) {
+        this.recommendationService = recommendationService;
     }
 
-    // Get latest recommendation for a user
-    @GetMapping("/latest")
-    public ResponseEntity<Recommendation> getLatestRecommendation(@RequestParam Long userId) {
-        Recommendation recommendation = recommendationService.getLatestRecommendation(userId);
-        return ResponseEntity.ok(recommendation);
+    // existing
+    @PostMapping("/{userId}")
+    public Recommendation generate(@PathVariable Long userId,
+                                   @RequestBody RecommendationRequest request) {
+        return recommendationService.generateRecommendation(userId, request);
     }
 
-    // Get all recommendations for a user in a date range
+    // existing
+    @GetMapping("/latest/{userId}")
+    public Recommendation latest(@PathVariable Long userId) {
+        return recommendationService.getLatestRecommendation(userId);
+    }
+
+    // STEP-5 REQUIRED (added)
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Recommendation>> getRecommendations(
-            @PathVariable Long userId,
-            @RequestParam LocalDate from,
-            @RequestParam LocalDate to) {
-        List<Recommendation> recommendations = recommendationService.getRecommendations(userId, from, to);
-        return ResponseEntity.ok(recommendations);
+    public List<Recommendation> getUserRecommendations(@PathVariable Long userId) {
+        return recommendationService.getRecommendations(userId, null, null);
     }
 }
