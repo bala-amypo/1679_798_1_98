@@ -15,7 +15,14 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                    .anyRequest().permitAll()   // AMYPO preview needs this
+                    // 🔐 Swagger access
+                    .requestMatchers(
+                            "/v3/api-docs/**",
+                            "/swagger-ui/**",
+                            "/swagger-ui.html"
+                    ).permitAll()
+                    // keep existing behaviour
+                    .anyRequest().permitAll()
             );
 
         return http.build();
