@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -18,7 +19,6 @@ public class LessonController {
     private final LessonService lessonService;
 
     // Add lesson to a course
-    // POST /lessons/course/{courseId}
     @PostMapping("/course/{courseId}")
     public ResponseEntity<MicroLesson> addLesson(
             @PathVariable Long courseId,
@@ -32,8 +32,9 @@ public class LessonController {
     public ResponseEntity<MicroLesson> updateLesson(
             @PathVariable Long lessonId,
             @RequestBody RecommendationRequest request) {
+
         MicroLesson updated = lessonService.updateLesson(lessonId, request);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(updated); // Lazy relations handled in entity
     }
 
     // Search lessons with optional filters
