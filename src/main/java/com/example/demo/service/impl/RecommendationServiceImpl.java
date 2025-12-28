@@ -26,7 +26,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     private final MicroLessonRepository microLessonRepository;
     private final ProgressRepository progressRepository;
 
-    // ✅ CONSTRUCTOR REQUIRED BY TESTS (DO NOT REMOVE)
+
     public RecommendationServiceImpl(
             RecommendationRepository recommendationRepository,
             UserRepository userRepository
