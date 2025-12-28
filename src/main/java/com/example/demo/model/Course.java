@@ -1,11 +1,8 @@
 package com.example.demo.model;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Setter
@@ -13,7 +10,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Course {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,7 +25,7 @@ public class Course {
 
     @ManyToOne
     @JoinColumn(name = "instructor_id")
-    @JsonIgnoreProperties({"courses"}) // 🔥 FIX
+    @JsonIgnoreProperties({"courses"})
     private User instructor;
 
     @PrePersist
