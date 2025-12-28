@@ -1,15 +1,13 @@
 package com.example.demo.controller;
-
 import com.example.demo.model.MicroLesson;
 import com.example.demo.service.LessonService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/lessons")
-@SecurityRequirement(name = "bearerAuth")   // 🔐 ADD THIS
+@SecurityRequirement(name = "bearerAuth")   
 public class LessonController {
 
     private final LessonService lessonService;
