@@ -16,10 +16,10 @@ public class LessonController {
         this.lessonService = lessonService;
     }
 
-    @PostMapping("/{courseId}")
-    public MicroLesson addLesson(@PathVariable Long courseId,
+    @PostMapping("/{lessonId}")
+    public MicroLesson addLesson(@PathVariable Long lessonId,
                                  @RequestBody MicroLesson lesson) {
-        return lessonService.addLesson(courseId, lesson);
+        return lessonService.addLesson(lessonId, lesson);
     }
 
     @GetMapping("/search")
